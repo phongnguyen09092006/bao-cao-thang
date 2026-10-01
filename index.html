@@ -9,6 +9,7 @@
             --primary: #007aff;
             --success: #34c759;
             --danger: #ff3b30;
+            --excel: #107c41;
             --bg: #f2f2f7;
             --card-bg: #ffffff;
             --text-main: #1c1c1e;
@@ -128,6 +129,15 @@
             color: white;
             margin-top: 8px;
         }
+        .btn-excel {
+            background-color: var(--excel);
+            color: white;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
         .btn-toggle {
             background: none;
             border: none;
@@ -136,6 +146,12 @@
             padding: 2px 4px;
             width: auto;
             font-weight: normal;
+        }
+        .status-sync {
+            font-size: 12px;
+            text-align: center;
+            margin-top: 6px;
+            font-weight: 500;
         }
         .result-box {
             background: #f9f9fb;
@@ -168,7 +184,7 @@
         <p>NV: HÙNG DŨNG</p>
     </div>
 
-    <!-- 1. CÀI ĐẶT CHỈ TIÊU (KPI) - TỰ ĐỘNG LƯU MỌI THAY ĐỔI -->
+    <!-- 1. CÀI ĐẶT CHỈ TIÊU (KPI) - TỰ ĐỘNG LƯU -->
     <div class="card">
         <div class="card-title">
             <span>🎯 Chỉ tiêu tháng (KPI)</span>
@@ -201,7 +217,6 @@
     <div class="card">
         <div class="card-title">📝 Thông tin báo cáo</div>
         
-        <!-- MỤC CHỌN LỊCH NGÀY BÁO CÁO -->
         <div class="input-group">
             <label>📅 Chọn ngày báo cáo (Bấm vào lịch để chọn):</label>
             <input type="date" id="reportDate" onchange="handleDateChange()">
@@ -223,9 +238,8 @@
             </div>
         </div>
 
-        <!-- MỤC TRỪ TIỀN RỚT ĐƠN (MỖI LẦN TÍNH XONG TỰ RESET VỀ 0) -->
         <div class="input-group" style="margin-top: 4px;">
-            <label style="color: #d93800; font-weight: 600;">⚠️ Tiền rớt đơn kế toán báo trừ (k):</label>
+            <label style="color: #d93800; font-weight: 600;">⚠️️ Tiền rớt đơn kế toán báo trừ (k):</label>
             <input type="number" id="deductionAmount" class="input-deduction" value="0" placeholder="Nhập số tiền trừ nếu có, không có để 0">
         </div>
 
@@ -234,7 +248,8 @@
             <textarea id="rawText" placeholder="Dán danh sách đơn (Ngày 28/9... ĐH 1... Đh 2...) vào đây..." oninput="autoDetectDate()"></textarea>
         </div>
 
-        <button class="btn-primary" onclick="processOrders()">⚡ Tính toán & Xuất báo cáo</button>
+        <button class="btn-primary" id="btnSubmit" onclick="processOrders()">⚡ Tính toán & Đồng bộ lên Drive</button>
+        <div id="syncStatus" class="status-sync"></div>
     </div>
 
     <!-- 3. KẾT QUẢ XUẤT RA -->
@@ -244,7 +259,7 @@
         <button class="btn-copy" onclick="copyReport()">📋 Sao chép báo cáo gửi Zalo</button>
     </div>
 
-    <!-- 4. LỊCH SỬ - MẶC ĐỊNH MỞ VÀ CÓ NÚT XEM/ẨN -->
+    <!-- 4. LỊCH SỬ & XUẤT BẢNG TÍNH -->
     <div class="card">
         <div class="card-title">
             <span>📜 Lịch sử các ngày</span>
@@ -252,12 +267,20 @@
         </div>
         <div id="historyBox">
             <div id="historyList"></div>
+            
+            <button class="btn-excel" onclick="exportToCSV()">
+                📗 Tải file bảng tính (.CSV) về máy
+            </button>
+            
             <button style="background: var(--danger); color: white; padding: 6px; font-size: 12px; margin-top: 10px;" onclick="clearHistory()">Xóa toàn bộ lịch sử</button>
         </div>
     </div>
 </div>
 
 <script>
+    // Dán URL Google Apps Script của bạn vào đây nếu dùng Google Sheet:
+    const GOOGLE_SHEET_URL = "";
+
     window.onload = function() {
         loadKpiSettings();
         loadDataFromHistory();
@@ -265,7 +288,6 @@
         document.getElementById('deductionAmount').value = 0;
     };
 
-    // Tự động lưu cài đặt KPI vào bộ nhớ máy mỗi khi nhập
     function saveKpiSettings() {
         localStorage.setItem('hd_kpi_month', document.getElementById('kpiMonthRevenue').value);
         localStorage.setItem('hd_kpi_day', document.getElementById('kpiDayRevenue').value);
@@ -273,7 +295,6 @@
         localStorage.setItem('hd_kpi_days', document.getElementById('kpiStandardDays').value);
     }
 
-    // Tự động tải cài đặt KPI từ bộ nhớ máy khi mở app
     function loadKpiSettings() {
         if (localStorage.getItem('hd_kpi_month') !== null) {
             document.getElementById('kpiMonthRevenue').value = localStorage.getItem('hd_kpi_month');
@@ -289,7 +310,7 @@
         }
     }
 
-    // Kiểm tra và áp dụng quy tắc mùng 1
+    // Quy tắc mùng 1
     function applyMung1RuleIfDay1(d) {
         if (d === 1) {
             document.getElementById('workDay').value = 1;
@@ -298,17 +319,16 @@
         }
     }
 
-    // Xử lý khi người dùng đổi ngày trên lịch
     function handleDateChange() {
         updateDateDisplay();
         const val = document.getElementById('reportDate').value;
         if (val) {
-            const [y, m, d] = val.split('-').map(Number);
+            const parts = val.split('-');
+            const d = parseInt(parts[2], 10);
             applyMung1RuleIfDay1(d);
         }
     }
 
-    // Cập nhật dòng chữ hiển thị tiếng Việt phía dưới ô lịch
     function updateDateDisplay() {
         const val = document.getElementById('reportDate').value;
         const preview = document.getElementById('datePreview');
@@ -316,17 +336,19 @@
             preview.innerHTML = '<span style="color:#ff3b30;">⚠️ Chưa chọn ngày báo cáo (Bấm vào ô lịch bên trên để chọn)</span>';
             return;
         }
-        const [y, m, d] = val.split('-').map(Number);
+        const parts = val.split('-');
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        const d = parseInt(parts[2], 10);
         preview.innerHTML = `✅ Đã chọn: Ngày <b>${d}</b> tháng <b>${m}</b> năm <b>${y}</b> (${d}/${m}/${y})`;
     }
 
-    // Đặt ngày vào ô lịch chuẩn ISO YYYY-MM-DD
-    function setCalendarDate(d, m, y) {
-        const yyyy = y;
-        const mm = String(m).padStart(2, '0');
-        const dd = String(d).padStart(2, '0');
-        document.getElementById('reportDate').value = `${yyyy}-${mm}-${dd}`;
+    // Đặt ngày trực tiếp bằng chuỗi ISO YYYY-MM-DD
+    function setCalendarDateISO(isoStr) {
+        document.getElementById('reportDate').value = isoStr;
         updateDateDisplay();
+        const parts = isoStr.split('-');
+        const d = parseInt(parts[2], 10);
         applyMung1RuleIfDay1(d);
     }
 
@@ -346,30 +368,39 @@
             let y = match[3] ? parseInt(match[3], 10) : new Date().getFullYear();
             if (y < 100) y += 2000;
             if (d >= 1 && d <= 31 && m >= 1 && m <= 12) {
-                setCalendarDate(d, m, y);
+                const mmStr = String(m).padStart(2, '0');
+                const ddStr = String(d).padStart(2, '0');
+                setCalendarDateISO(`${y}-${mmStr}-${ddStr}`);
             }
         }
     }
 
-    // Tính ngày tiếp theo từ ngày ISO (YYYY-MM-DD)
-    function getNextDayFromISO(isoStr) {
+    // THUẬT TOÁN TÍNH CHÍNH XÁC NGÀY TIẾP THEO (KHÔNG BỊ LỖI THÁNG 10 SANG THÁNG 11)
+    function getNextDayISO(isoStr) {
         if (!isoStr) return null;
         const [y, m, d] = isoStr.split('-').map(Number);
-        const dt = new Date(y, m - 1, d);
-        dt.setDate(dt.getDate() + 1);
-        return { day: dt.getDate(), month: dt.getMonth() + 1, year: dt.getFullYear() };
+        
+        // Sử dụng UTC để tránh lệch múi giờ
+        const currentUtc = new Date(Date.UTC(y, m - 1, d));
+        currentUtc.setUTCDate(currentUtc.getUTCDate() + 1);
+        
+        const nextY = currentUtc.getUTCFullYear();
+        const nextM = String(currentUtc.getUTCMonth() + 1).padStart(2, '0');
+        const nextD = String(currentUtc.getUTCDate()).padStart(2, '0');
+        
+        return `${nextY}-${nextM}-${nextD}`;
     }
 
-    // Nạp dữ liệu từ lịch sử
     function loadDataFromHistory() {
         const history = JSON.parse(localStorage.getItem('hd_history') || '[]');
         if (history.length > 0) {
             const last = history[0];
             if (last.isoDate) {
-                const nextDay = getNextDayFromISO(last.isoDate);
-                if (nextDay) {
-                    setCalendarDate(nextDay.day, nextDay.month, nextDay.year);
-                    if (nextDay.day === 1) {
+                const nextISO = getNextDayISO(last.isoDate);
+                if (nextISO) {
+                    setCalendarDateISO(nextISO);
+                    const nextD = parseInt(nextISO.split('-')[2], 10);
+                    if (nextD === 1) {
                         applyMung1RuleIfDay1(1);
                     } else {
                         document.getElementById('prevRevenue').value = last.cumulative;
@@ -379,7 +410,6 @@
                 }
             }
         } else {
-            // Ngày đầu tiên: để trống hoàn toàn chờ nhập
             document.getElementById('reportDate').value = '';
             document.getElementById('prevRevenue').value = '';
             document.getElementById('prevOrders').value = '';
@@ -388,14 +418,13 @@
         }
     }
 
-    function processOrders() {
+    async function processOrders() {
         const text = document.getElementById('rawText').value;
         if (!text.trim()) {
             alert("Vui lòng dán nội dung đơn hàng!");
             return;
         }
 
-        // 1. Kiểm tra ngày báo cáo
         const dateVal = document.getElementById('reportDate').value;
         if (!dateVal) {
             alert("Vui lòng chọn ngày báo cáo từ ô lịch trước khi tính!");
@@ -404,11 +433,11 @@
         const [y, m, d] = dateVal.split('-').map(Number);
         const displayDateStr = `${d}/${m}/${y}`;
 
-        // 2. Đếm số lượng đơn hàng
+        // 1. Đếm đơn hàng
         const orderMatches = text.match(/(?:ĐH|Đh|DH|dh)\s*\d+[:\s]/gi);
         const todayOrders = orderMatches ? orderMatches.length : 0;
 
-        // 3. Tính tiền bán được hôm nay
+        // 2. Tính doanh số ngày
         const lineRegex = /(\d+)\s*(?:bành|lốc|thùng|cuộn|gói|hộp)?\s*[x*]\s*([\d\.,]+)/gi;
         let todayRevenue = 0;
         let match;
@@ -420,7 +449,7 @@
         }
         todayRevenue = Math.round(todayRevenue);
 
-        // 4. Lấy số cũ, số tiền rớt đơn và KPI
+        // 3. Lấy số cũ và KPI
         const prevRev = parseFloat(document.getElementById('prevRevenue').value) || 0;
         const prevOrd = parseInt(document.getElementById('prevOrders').value) || 0;
         const workDay = parseInt(document.getElementById('workDay').value) || 1;
@@ -431,11 +460,9 @@
         const kpiOrders = parseInt(document.getElementById('kpiTotalOrders').value) || 175;
         const kpiDays = parseInt(document.getElementById('kpiStandardDays').value) || 25;
 
-        // Tổng doanh số lũy kế = Cũ + Hôm nay - Rớt đơn
         const totalRev = prevRev + todayRevenue - deduction;
         const totalOrd = prevOrd + todayOrders;
 
-        // 5. Làm tròn thông thường (Math.round)
         const timeRate = Math.min(100, Math.round((workDay / kpiDays) * 100));
         const dayRate = Math.round((todayRevenue / kpiDay) * 100);
         const monthRate = Math.round((totalRev / kpiMonth) * 100);
@@ -443,7 +470,6 @@
 
         const kpiMonthLabel = (kpiMonth >= 1000) ? (kpiMonth / 1000) + 'tr' : kpiMonth + 'k';
 
-        // 6. Xuất mẫu báo cáo hoàn chỉnh
         const report = 
 `Báo cáo bán hàng ngày:      ${displayDateStr}
 - NV: HÙNG DŨNG
@@ -458,11 +484,34 @@
         document.getElementById('reportOutput').innerText = report;
         document.getElementById('resultCard').style.display = 'block';
 
-        // 7. Lưu lại lịch sử
-        saveToHistory(dateVal, displayDateStr, workDay, todayOrders, todayRevenue, totalRev, totalOrd, deduction);
-
-        // Reset ô rớt đơn về 0 cho lần sau
+        saveToHistory(dateVal, displayDateStr, workDay, todayOrders, todayRevenue, totalRev, totalOrd, deduction, text);
         document.getElementById('deductionAmount').value = 0;
+
+        // Đồng bộ lên Google Drive (nếu có URL)
+        const syncStatus = document.getElementById('syncStatus');
+        if (GOOGLE_SHEET_URL && GOOGLE_SHEET_URL.startsWith("https://script.google.com")) {
+            syncStatus.innerHTML = '<span style="color:#007aff;">⏳ Đang đồng bộ dòng mới lên Google Drive...</span>';
+            try {
+                await fetch(GOOGLE_SHEET_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: displayDateStr,
+                        workDay: workDay,
+                        orders: todayOrders,
+                        revenue: todayRevenue,
+                        deduction: deduction,
+                        cumulative: totalRev,
+                        cumulativeOrders: totalOrd,
+                        rawText: text
+                    })
+                });
+                syncStatus.innerHTML = '<span style="color:#34c759;">✅ Đã đồng bộ lên Google Sheet thành công!</span>';
+            } catch (err) {
+                syncStatus.innerHTML = '<span style="color:#ff3b30;">⚠️ Chưa đồng bộ được lên Drive (Dữ liệu vẫn an toàn trên máy).</span>';
+            }
+        }
     }
 
     function copyReport() {
@@ -472,7 +521,7 @@
         });
     }
 
-    function saveToHistory(isoDate, dateStr, workDay, orders, revenue, cumulative, cumulativeOrders, deduction) {
+    function saveToHistory(isoDate, dateStr, workDay, orders, revenue, cumulative, cumulativeOrders, deduction, rawText) {
         let history = JSON.parse(localStorage.getItem('hd_history') || '[]');
         
         history.unshift({
@@ -483,17 +532,19 @@
             revenue: revenue,
             cumulative: cumulative,
             cumulativeOrders: cumulativeOrders,
-            deduction: deduction
+            deduction: deduction,
+            rawText: rawText || ''
         });
 
         localStorage.setItem('hd_history', JSON.stringify(history));
         renderHistory();
 
-        // Tự động nhảy sang ngày tiếp theo trên lịch cho lần tính tới
-        const nextDay = getNextDayFromISO(isoDate);
-        if (nextDay) {
-            setCalendarDate(nextDay.day, nextDay.month, nextDay.year);
-            if (nextDay.day === 1) {
+        // Tự động nhảy lịch sang ngày tiếp theo (Chuẩn UTC)
+        const nextISO = getNextDayISO(isoDate);
+        if (nextISO) {
+            setCalendarDateISO(nextISO);
+            const nextD = parseInt(nextISO.split('-')[2], 10);
+            if (nextD === 1) {
                 applyMung1RuleIfDay1(1);
             } else {
                 document.getElementById('prevRevenue').value = cumulative;
@@ -513,10 +564,35 @@
         }
         container.innerHTML = history.map(item => `
             <div class="history-item">
-                <span><b>📅 ${item.date}</b> (${item.orders} đơn${item.deduction > 0 ? ` - trừ rớt ${item.deduction}k` : ''})</span>
+                <span><b>📅 ${item.date}</b> (${item.orders} đơn${item.deduction > 0 ? ` - trừ ${item.deduction}k` : ''})</span>
                 <span>Ngày: <b>${item.revenue.toLocaleString('vi-VN')}k</b> | DS lũy kế: <b>${item.cumulative.toLocaleString('vi-VN')}k</b></span>
             </div>
         `).join('');
+    }
+
+    function exportToCSV() {
+        const history = JSON.parse(localStorage.getItem('hd_history') || '[]');
+        if (history.length === 0) {
+            alert("Chưa có lịch sử để xuất bảng tính!");
+            return;
+        }
+
+        let csvContent = "\uFEFF";
+        csvContent += "Ngày,Ngày công,Số đơn ngày,DS ngày (k),Tiền trừ rớt (k),DS lũy kế (k),Tổng đơn lũy kế\n";
+
+        const exportData = [...history].reverse();
+        exportData.forEach(row => {
+            csvContent += `"${row.date}",${row.workDay},${row.orders},${row.revenue},${row.deduction || 0},${row.cumulative},${row.cumulativeOrders}\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Bao_Cao_Ban_Hang_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     function toggleElement(id) {
