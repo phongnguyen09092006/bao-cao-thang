@@ -111,7 +111,7 @@
             font-weight: 600;
         }
         textarea {
-            height: 150px;
+            height: 140px;
             resize: vertical;
             font-family: monospace;
             line-height: 1.4;
@@ -166,15 +166,76 @@
             line-height: 1.5;
             color: #111;
         }
+        /* Lịch sử bấm vào xem được */
         .history-item {
             border-bottom: 1px solid #e5e5ea;
-            padding: 8px 0;
-            font-size: 12.5px;
+            padding: 10px 4px;
+            font-size: 13px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+        .history-item:active {
+            background-color: #e5e5ea;
         }
         .history-item:last-child {
             border-bottom: none;
+        }
+        .history-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .history-arrow {
+            font-size: 13px;
+            color: var(--text-sub);
+            padding-left: 6px;
+        }
+        /* Popup Modal xem chi tiết */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 999;
+        }
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 440px;
+            border-radius: 14px;
+            padding: 16px;
+            box-sizing: border-box;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #8e8e93;
+            width: auto;
+            padding: 0 4px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -267,7 +328,7 @@
     <!-- 4. LỊCH SỬ & XUẤT BẢNG TÍNH -->
     <div class="card">
         <div class="card-title">
-            <span>📜 Lịch sử các ngày</span>
+            <span>📜 Lịch sử các ngày (Bấm vào ngày để xem lại)</span>
             <button class="btn-toggle" onclick="toggleElement('historyBox')">Xem/Ẩn</button>
         </div>
         <div id="historyBox">
@@ -278,6 +339,23 @@
             </button>
             
             <button style="background: var(--danger); color: white; padding: 6px; font-size: 12px; margin-top: 10px;" onclick="clearHistory()">Xóa toàn bộ lịch sử</button>
+        </div>
+    </div>
+</div>
+
+<!-- POPUP XEM LẠI BÁO CÁO CỦA TỪNG NGÀY ĐÃ LƯU -->
+<div id="historyModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 id="modalTitle">Chi tiết báo cáo</h3>
+            <button class="btn-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="result-box" id="modalReportOutput"></div>
+        <button class="btn-copy" id="modalCopyBtn" onclick="copyModalReport()">📋 Sao chép lại báo cáo này</button>
+        
+        <div style="margin-top: 14px;">
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-sub);">Nội dung đơn hàng đã nhập:</label>
+            <div id="modalRawText" style="margin-top: 4px; padding: 8px; background: #f2f2f7; border-radius: 8px; font-size: 12px; max-height: 120px; overflow-y: auto; white-space: pre-wrap; font-family: monospace;"></div>
         </div>
     </div>
 </div>
@@ -433,7 +511,6 @@
         }
     }
 
-    // THUẬT TOÁN TÍNH TIỀN TỪNG ĐƠN HÀNG VÀ TỰ ĐỘNG TRỪ CHIẾT KHẤU (%)
     function parseOrdersAndRevenue(text) {
         const orderRegex = /(?:ĐH|Đh|DH|dh)\s*\d+[:\s]/gi;
         const matches = [...text.matchAll(orderRegex)];
@@ -442,7 +519,6 @@
         let todayRevenue = 0;
 
         if (todayOrders === 0) {
-            // Trường hợp không có tiền tố ĐH, tính toàn bộ phép nhân trong văn bản
             const lineRegex = /(\d+)\s*(?:bành|lốc|thùng|cuộn|gói|hộp)?\s*[x*]\s*([\d\.,]+)/gi;
             let m;
             while ((m = lineRegex.exec(text)) !== null) {
@@ -453,13 +529,11 @@
             return { orders: 0, revenue: Math.round(todayRevenue) };
         }
 
-        // Chia văn bản thành các khối đơn hàng riêng biệt
         for (let i = 0; i < matches.length; i++) {
             const startIndex = matches[i].index;
             const endIndex = (i + 1 < matches.length) ? matches[i + 1].index : text.length;
             const orderContent = text.substring(startIndex, endIndex);
 
-            // 1. Tính tổng gộp của đơn
             let orderTotal = 0;
             const lineRegex = /(\d+)\s*(?:bành|lốc|thùng|cuộn|gói|hộp)?\s*[x*]\s*([\d\.,]+)/gi;
             let lineMatch;
@@ -469,14 +543,12 @@
                 orderTotal += (qty * price);
             }
 
-            // 2. Kiểm tra chiết khấu trong đơn (VD: ck 3%, chiết khấu 5%, ck: 3%...)
             let discountRate = 0;
             const discountMatch = orderContent.match(/(?:ck|chiết\s*khấu)[\s:]*([0-9\.,]+)\s*%/i);
             if (discountMatch) {
                 discountRate = (parseFloat(discountMatch[1].replace(',', '.')) || 0) / 100;
             }
 
-            // 3. Trừ chiết khấu nếu có
             if (discountRate > 0) {
                 orderTotal = orderTotal * (1 - discountRate);
             }
@@ -512,7 +584,6 @@
 
         const displayDateStr = `${d}/${m}/${y}`;
 
-        // Bóc tách đơn và tính doanh số (đã xử lý chiết khấu)
         const parsed = parseOrdersAndRevenue(text);
         const todayOrders = parsed.orders;
         const todayRevenue = parsed.revenue;
@@ -551,7 +622,8 @@
         document.getElementById('reportOutput').innerText = report;
         document.getElementById('resultCard').style.display = 'block';
 
-        saveToHistory(d, m, y, displayDateStr, workDay, todayOrders, todayRevenue, totalRev, totalOrd, deduction, text);
+        // Lưu bản ghi kèm theo cả văn bản báo cáo đã xuất
+        saveToHistory(d, m, y, displayDateStr, workDay, todayOrders, todayRevenue, totalRev, totalOrd, deduction, text, report);
         document.getElementById('deductionAmount').value = 0;
 
         const syncStatus = document.getElementById('syncStatus');
@@ -587,7 +659,7 @@
         });
     }
 
-    function saveToHistory(d, m, y, dateStr, workDay, orders, revenue, cumulative, cumulativeOrders, deduction, rawText) {
+    function saveToHistory(d, m, y, dateStr, workDay, orders, revenue, cumulative, cumulativeOrders, deduction, rawText, reportText) {
         let history = JSON.parse(localStorage.getItem('hd_history') || '[]');
         
         history.unshift({
@@ -601,7 +673,8 @@
             cumulative: cumulative,
             cumulativeOrders: cumulativeOrders,
             deduction: deduction,
-            rawText: rawText || ''
+            rawText: rawText || '',
+            reportText: reportText || ''
         });
 
         localStorage.setItem('hd_history', JSON.stringify(history));
@@ -628,12 +701,39 @@
             container.innerHTML = '<p style="color:#8e8e93; font-size:12px; margin:0;">Chưa có dữ liệu nào trong lịch sử.</p>';
             return;
         }
-        container.innerHTML = history.map(item => `
-            <div class="history-item">
-                <span><b>📅 ${item.date}</b> (${item.orders} đơn${item.deduction > 0 ? ` - trừ ${item.deduction}k` : ''})</span>
-                <span>Ngày: <b>${item.revenue.toLocaleString('vi-VN')}k</b> | DS lũy kế: <b>${item.cumulative.toLocaleString('vi-VN')}k</b></span>
+        container.innerHTML = history.map((item, index) => `
+            <div class="history-item" onclick="openHistoryDetail(${index})">
+                <div class="history-meta">
+                    <span><b>📅 ${item.date}</b> (${item.orders} đơn${item.deduction > 0 ? ` - trừ ${item.deduction}k` : ''})</span>
+                    <span style="font-size:11.5px; color:var(--text-sub);">DS ngày: <b>${item.revenue.toLocaleString('vi-VN')}k</b> | Lũy kế: <b>${item.cumulative.toLocaleString('vi-VN')}k</b></span>
+                </div>
+                <div class="history-arrow">▶</div>
             </div>
         `).join('');
+    }
+
+    // MỞ CHI TIẾT ĐƠN HÀNG VÀ BÁO CÁO CỦA NGÀY TRONG LỊCH SỬ
+    function openHistoryDetail(index) {
+        const history = JSON.parse(localStorage.getItem('hd_history') || '[]');
+        const item = history[index];
+        if (!item) return;
+
+        document.getElementById('modalTitle').innerText = `Báo cáo ngày: ${item.date}`;
+        document.getElementById('modalReportOutput').innerText = item.reportText || "Không có nội dung báo cáo lưu kèm.";
+        document.getElementById('modalRawText').innerText = item.rawText || "(Không có nội dung đơn gốc)";
+        
+        document.getElementById('historyModal').style.display = 'flex';
+    }
+
+    function closeModal(e) {
+        document.getElementById('historyModal').style.display = 'none';
+    }
+
+    function copyModalReport() {
+        const text = document.getElementById('modalReportOutput').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Đã sao chép lại báo cáo của ngày này!");
+        });
     }
 
     function exportToCSV() {
