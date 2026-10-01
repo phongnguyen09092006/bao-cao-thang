@@ -64,6 +64,12 @@
             gap: 8px;
             margin-bottom: 8px;
         }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
         .input-group {
             margin-bottom: 6px;
         }
@@ -74,7 +80,7 @@
             color: var(--text-sub);
             margin-bottom: 3px;
         }
-        input, textarea {
+        input, textarea, select {
             width: 100%;
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -84,19 +90,19 @@
             background: #fff;
             color: var(--text-main);
         }
-        input[type="date"] {
-            cursor: pointer;
-            font-family: inherit;
-        }
-        input:focus, textarea:focus {
+        input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--primary);
         }
-        .date-preview {
-            font-size: 12.5px;
+        .date-badge {
+            background: #e1f0ff;
+            color: #007aff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: 600;
             margin-top: 4px;
-            color: var(--primary);
+            display: inline-block;
         }
         .input-deduction {
             border-color: #ff9500;
@@ -133,10 +139,6 @@
             background-color: var(--excel);
             color: white;
             margin-top: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
         }
         .btn-toggle {
             background: none;
@@ -217,13 +219,31 @@
     <div class="card">
         <div class="card-title">📝 Thông tin báo cáo</div>
         
-        <div class="input-group">
-            <label>📅 Chọn ngày báo cáo (Bấm vào lịch để chọn):</label>
-            <input type="date" id="reportDate" onchange="handleDateChange()">
-            <div id="datePreview" class="date-preview">⚠️ Chưa chọn ngày báo cáo</div>
+        <!-- CHỌN RÕ RÀNG NGÀY - THÁNG - NĂM (KHÔNG BỊ NHẦM THỨ TỰ) -->
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-main);">📅 Ngày báo cáo:</label>
+        <div class="grid-3" style="margin-top: 4px;">
+            <div class="input-group">
+                <label>Ngày:</label>
+                <select id="selDay" onchange="onDateSelectionChanged()">
+                    <option value="">--</option>
+                    <!-- Tự động sinh từ ngày 1 đến 31 -->
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Tháng:</label>
+                <select id="selMonth" onchange="onDateSelectionChanged()">
+                    <option value="">--</option>
+                    <!-- Tự động sinh từ tháng 1 đến 12 -->
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Năm:</label>
+                <input type="number" id="selYear" value="2026" oninput="onDateSelectionChanged()">
+            </div>
         </div>
+        <div id="dateNotice" class="date-badge">Chưa chọn ngày</div>
 
-        <div class="grid-3" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px;">
+        <div class="grid-3" style="margin-top: 10px;">
             <div class="input-group">
                 <label>Ngày công:</label>
                 <input type="number" id="workDay" placeholder="Để trống">
@@ -239,13 +259,16 @@
         </div>
 
         <div class="input-group" style="margin-top: 4px;">
-            <label style="color: #d93800; font-weight: 600;">⚠️️ Tiền rớt đơn kế toán báo trừ (k):</label>
+            <label style="color: #d93800; font-weight: 600;">⚠️ Tiền rớt đơn kế toán báo trừ (k):</label>
             <input type="number" id="deductionAmount" class="input-deduction" value="0" placeholder="Nhập số tiền trừ nếu có, không có để 0">
         </div>
 
         <div class="input-group" style="margin-top: 6px;">
-            <label>Dán nội dung đơn hàng vào đây:</label>
-            <textarea id="rawText" placeholder="Dán danh sách đơn (Ngày 28/9... ĐH 1... Đh 2...) vào đây..." oninput="autoDetectDate()"></textarea>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <label style="margin: 0;">Dán nội dung đơn hàng vào đây:</label>
+                <button type="button" class="btn-toggle" onclick="autoDetectDateFromText()">🔍 Lấy ngày từ text</button>
+            </div>
+            <textarea id="rawText" placeholder="Dán danh sách đơn (ĐH 1, Đh 2...) vào đây..."></textarea>
         </div>
 
         <button class="btn-primary" id="btnSubmit" onclick="processOrders()">⚡ Tính toán & Đồng bộ lên Drive</button>
@@ -278,15 +301,33 @@
 </div>
 
 <script>
-    // Dán URL Google Apps Script của bạn vào đây nếu dùng Google Sheet:
     const GOOGLE_SHEET_URL = "";
 
     window.onload = function() {
+        initDropdowns();
         loadKpiSettings();
         loadDataFromHistory();
         renderHistory();
         document.getElementById('deductionAmount').value = 0;
     };
+
+    function initDropdowns() {
+        const daySelect = document.getElementById('selDay');
+        for (let i = 1; i <= 31; i++) {
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = i;
+            daySelect.appendChild(opt);
+        }
+
+        const monthSelect = document.getElementById('selMonth');
+        for (let i = 1; i <= 12; i++) {
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = `Tháng ${i}`;
+            monthSelect.appendChild(opt);
+        }
+    }
 
     function saveKpiSettings() {
         localStorage.setItem('hd_kpi_month', document.getElementById('kpiMonthRevenue').value);
@@ -310,7 +351,6 @@
         }
     }
 
-    // Quy tắc mùng 1
     function applyMung1RuleIfDay1(d) {
         if (d === 1) {
             document.getElementById('workDay').value = 1;
@@ -319,102 +359,101 @@
         }
     }
 
-    function handleDateChange() {
-        updateDateDisplay();
-        const val = document.getElementById('reportDate').value;
-        if (val) {
-            const parts = val.split('-');
-            const d = parseInt(parts[2], 10);
+    function onDateSelectionChanged() {
+        const d = parseInt(document.getElementById('selDay').value, 10);
+        const m = parseInt(document.getElementById('selMonth').value, 10);
+        const y = parseInt(document.getElementById('selYear').value, 10) || 2026;
+
+        if (d && m) {
+            document.getElementById('dateNotice').innerText = `✅ Báo cáo ngày: ${d}/${m}/${y}`;
             applyMung1RuleIfDay1(d);
+        } else {
+            document.getElementById('dateNotice').innerText = "⚠️ Chưa chọn đủ ngày và tháng";
         }
     }
 
-    function updateDateDisplay() {
-        const val = document.getElementById('reportDate').value;
-        const preview = document.getElementById('datePreview');
-        if (!val) {
-            preview.innerHTML = '<span style="color:#ff3b30;">⚠️ Chưa chọn ngày báo cáo (Bấm vào ô lịch bên trên để chọn)</span>';
+    function setDateFields(d, m, y) {
+        document.getElementById('selDay').value = d;
+        document.getElementById('selMonth').value = m;
+        document.getElementById('selYear').value = y;
+        onDateSelectionChanged();
+    }
+
+    // Nút chủ động bóc tách ngày từ đoạn chat nếu người dùng muốn
+    function autoDetectDateFromText() {
+        const text = document.getElementById('rawText').value;
+        if (!text) {
+            alert("Vui lòng dán văn bản đơn hàng trước!");
             return;
         }
-        const parts = val.split('-');
-        const y = parseInt(parts[0], 10);
-        const m = parseInt(parts[1], 10);
-        const d = parseInt(parts[2], 10);
-        preview.innerHTML = `✅ Đã chọn: Ngày <b>${d}</b> tháng <b>${m}</b> năm <b>${y}</b> (${d}/${m}/${y})`;
-    }
-
-    // Đặt ngày trực tiếp bằng chuỗi ISO YYYY-MM-DD
-    function setCalendarDateISO(isoStr) {
-        document.getElementById('reportDate').value = isoStr;
-        updateDateDisplay();
-        const parts = isoStr.split('-');
-        const d = parseInt(parts[2], 10);
-        applyMung1RuleIfDay1(d);
-    }
-
-    // Tự động nhận diện định dạng ngày trong văn bản
-    function autoDetectDate() {
-        const text = document.getElementById('rawText').value;
-        if (!text) return;
-
         let match = text.match(/(?:ngày[:\s]+)(\d{1,2})[\/\.\-](\d{1,2})(?:[\/\.\-](\d{2,4}))?/i);
         if (!match) {
             match = text.match(/(?:^|\n)\s*(\d{1,2})[\/\.\-](\d{1,2})(?:[\/\.\-](\d{2,4}))?/);
         }
-
         if (match) {
             const d = parseInt(match[1], 10);
             const m = parseInt(match[2], 10);
-            let y = match[3] ? parseInt(match[3], 10) : new Date().getFullYear();
+            let y = match[3] ? parseInt(match[3], 10) : 2026;
             if (y < 100) y += 2000;
-            if (d >= 1 && d <= 31 && m >= 1 && m <= 12) {
-                const mmStr = String(m).padStart(2, '0');
-                const ddStr = String(d).padStart(2, '0');
-                setCalendarDateISO(`${y}-${mmStr}-${ddStr}`);
-            }
+            setDateFields(d, m, y);
+            alert(`Đã nhận diện ngày: ${d}/${m}/${y}`);
+        } else {
+            alert("Không tìm thấy ngày trong văn bản!");
         }
     }
 
-    // THUẬT TOÁN TÍNH CHÍNH XÁC NGÀY TIẾP THEO (KHÔNG BỊ LỖI THÁNG 10 SANG THÁNG 11)
-    function getNextDayISO(isoStr) {
-        if (!isoStr) return null;
-        const [y, m, d] = isoStr.split('-').map(Number);
-        
-        // Sử dụng UTC để tránh lệch múi giờ
-        const currentUtc = new Date(Date.UTC(y, m - 1, d));
-        currentUtc.setUTCDate(currentUtc.getUTCDate() + 1);
-        
-        const nextY = currentUtc.getUTCFullYear();
-        const nextM = String(currentUtc.getUTCMonth() + 1).padStart(2, '0');
-        const nextD = String(currentUtc.getUTCDate()).padStart(2, '0');
-        
-        return `${nextY}-${nextM}-${nextD}`;
+    // THUẬT TOÁN TÍNH TOÁN NGÀY KẾ TIẾP CHUẨN XÁC 100%
+    function calculateNextDay(d, m, y) {
+        // Tháng có 30 ngày: 4, 6, 9, 11
+        // Tháng có 31 ngày: 1, 3, 5, 7, 8, 10, 12
+        // Tháng 2 có 28 hoặc 29 ngày
+        let maxDays = 31;
+        if (m === 4 || m === 6 || m === 9 || m === 11) {
+            maxDays = 30;
+        } else if (m === 2) {
+            maxDays = (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) ? 29 : 28;
+        }
+
+        let nextD = d + 1;
+        let nextM = m;
+        let nextY = y;
+
+        if (nextD > maxDays) {
+            nextD = 1;
+            nextM += 1;
+            if (nextM > 12) {
+                nextM = 1;
+                nextY += 1;
+            }
+        }
+
+        return { day: nextD, month: nextM, year: nextY };
     }
 
     function loadDataFromHistory() {
         const history = JSON.parse(localStorage.getItem('hd_history') || '[]');
         if (history.length > 0) {
             const last = history[0];
-            if (last.isoDate) {
-                const nextISO = getNextDayISO(last.isoDate);
-                if (nextISO) {
-                    setCalendarDateISO(nextISO);
-                    const nextD = parseInt(nextISO.split('-')[2], 10);
-                    if (nextD === 1) {
-                        applyMung1RuleIfDay1(1);
-                    } else {
-                        document.getElementById('prevRevenue').value = last.cumulative;
-                        document.getElementById('prevOrders').value = last.cumulativeOrders;
-                        document.getElementById('workDay').value = (parseInt(last.workDay) || 0) + 1;
-                    }
+            if (last.day && last.month && last.year) {
+                const next = calculateNextDay(last.day, last.month, last.year);
+                setDateFields(next.day, next.month, next.year);
+
+                if (next.day === 1) {
+                    applyMung1RuleIfDay1(1);
+                } else {
+                    document.getElementById('prevRevenue').value = last.cumulative;
+                    document.getElementById('prevOrders').value = last.cumulativeOrders;
+                    document.getElementById('workDay').value = (parseInt(last.workDay, 10) || 0) + 1;
                 }
             }
         } else {
-            document.getElementById('reportDate').value = '';
+            // Ngày đầu tiên: để trống hoàn toàn
+            document.getElementById('selDay').value = "";
+            document.getElementById('selMonth').value = "";
             document.getElementById('prevRevenue').value = '';
             document.getElementById('prevOrders').value = '';
             document.getElementById('workDay').value = '';
-            updateDateDisplay();
+            document.getElementById('dateNotice').innerText = "Chưa chọn ngày";
         }
     }
 
@@ -425,19 +464,22 @@
             return;
         }
 
-        const dateVal = document.getElementById('reportDate').value;
-        if (!dateVal) {
-            alert("Vui lòng chọn ngày báo cáo từ ô lịch trước khi tính!");
+        const d = parseInt(document.getElementById('selDay').value, 10);
+        const m = parseInt(document.getElementById('selMonth').value, 10);
+        const y = parseInt(document.getElementById('selYear').value, 10) || 2026;
+
+        if (!d || !m) {
+            alert("Vui lòng chọn Ngày và Tháng của báo cáo!");
             return;
         }
-        const [y, m, d] = dateVal.split('-').map(Number);
+
         const displayDateStr = `${d}/${m}/${y}`;
 
-        // 1. Đếm đơn hàng
+        // 1. Đếm số đơn hàng
         const orderMatches = text.match(/(?:ĐH|Đh|DH|dh)\s*\d+[:\s]/gi);
         const todayOrders = orderMatches ? orderMatches.length : 0;
 
-        // 2. Tính doanh số ngày
+        // 2. Tính doanh số trong ngày
         const lineRegex = /(\d+)\s*(?:bành|lốc|thùng|cuộn|gói|hộp)?\s*[x*]\s*([\d\.,]+)/gi;
         let todayRevenue = 0;
         let match;
@@ -470,6 +512,7 @@
 
         const kpiMonthLabel = (kpiMonth >= 1000) ? (kpiMonth / 1000) + 'tr' : kpiMonth + 'k';
 
+        // 4. Xuất mẫu báo cáo
         const report = 
 `Báo cáo bán hàng ngày:      ${displayDateStr}
 - NV: HÙNG DŨNG
@@ -484,13 +527,14 @@
         document.getElementById('reportOutput').innerText = report;
         document.getElementById('resultCard').style.display = 'block';
 
-        saveToHistory(dateVal, displayDateStr, workDay, todayOrders, todayRevenue, totalRev, totalOrd, deduction, text);
+        // 5. Lưu lịch sử
+        saveToHistory(d, m, y, displayDateStr, workDay, todayOrders, todayRevenue, totalRev, totalOrd, deduction, text);
         document.getElementById('deductionAmount').value = 0;
 
-        // Đồng bộ lên Google Drive (nếu có URL)
+        // 6. Đồng bộ Google Drive
         const syncStatus = document.getElementById('syncStatus');
         if (GOOGLE_SHEET_URL && GOOGLE_SHEET_URL.startsWith("https://script.google.com")) {
-            syncStatus.innerHTML = '<span style="color:#007aff;">⏳ Đang đồng bộ dòng mới lên Google Drive...</span>';
+            syncStatus.innerHTML = '<span style="color:#007aff;">⏳ Đang đồng bộ lên Google Drive...</span>';
             try {
                 await fetch(GOOGLE_SHEET_URL, {
                     method: 'POST',
@@ -509,7 +553,7 @@
                 });
                 syncStatus.innerHTML = '<span style="color:#34c759;">✅ Đã đồng bộ lên Google Sheet thành công!</span>';
             } catch (err) {
-                syncStatus.innerHTML = '<span style="color:#ff3b30;">⚠️ Chưa đồng bộ được lên Drive (Dữ liệu vẫn an toàn trên máy).</span>';
+                syncStatus.innerHTML = '<span style="color:#ff3b30;">⚠️ Chưa đồng bộ lên Drive (Đã lưu an toàn trên máy).</span>';
             }
         }
     }
@@ -521,11 +565,13 @@
         });
     }
 
-    function saveToHistory(isoDate, dateStr, workDay, orders, revenue, cumulative, cumulativeOrders, deduction, rawText) {
+    function saveToHistory(d, m, y, dateStr, workDay, orders, revenue, cumulative, cumulativeOrders, deduction, rawText) {
         let history = JSON.parse(localStorage.getItem('hd_history') || '[]');
         
         history.unshift({
-            isoDate: isoDate,
+            day: d,
+            month: m,
+            year: y,
             date: dateStr,
             workDay: workDay,
             orders: orders,
@@ -539,19 +585,18 @@
         localStorage.setItem('hd_history', JSON.stringify(history));
         renderHistory();
 
-        // Tự động nhảy lịch sang ngày tiếp theo (Chuẩn UTC)
-        const nextISO = getNextDayISO(isoDate);
-        if (nextISO) {
-            setCalendarDateISO(nextISO);
-            const nextD = parseInt(nextISO.split('-')[2], 10);
-            if (nextD === 1) {
-                applyMung1RuleIfDay1(1);
-            } else {
-                document.getElementById('prevRevenue').value = cumulative;
-                document.getElementById('prevOrders').value = cumulativeOrders;
-                document.getElementById('workDay').value = parseInt(workDay) + 1;
-            }
+        // Tự động nhảy sang ngày tiếp theo
+        const next = calculateNextDay(d, m, y);
+        setDateFields(next.day, next.month, next.year);
+
+        if (next.day === 1) {
+            applyMung1RuleIfDay1(1);
+        } else {
+            document.getElementById('prevRevenue').value = cumulative;
+            document.getElementById('prevOrders').value = cumulativeOrders;
+            document.getElementById('workDay').value = parseInt(workDay, 10) + 1;
         }
+
         document.getElementById('rawText').value = '';
     }
 
