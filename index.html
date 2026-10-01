@@ -111,7 +111,7 @@
             font-weight: 600;
         }
         textarea {
-            height: 140px;
+            height: 150px;
             resize: vertical;
             font-family: monospace;
             line-height: 1.4;
@@ -219,7 +219,6 @@
     <div class="card">
         <div class="card-title">📝 Thông tin báo cáo</div>
         
-        <!-- MỤC CHỌN LỊCH TRỰC QUAN -->
         <div class="input-group">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <label style="margin: 0;">📅 Chọn ngày báo cáo:</label>
@@ -250,8 +249,8 @@
         </div>
 
         <div class="input-group" style="margin-top: 6px;">
-            <label>Dán nội dung đơn hàng vào đây:</label>
-            <textarea id="rawText" placeholder="Dán danh sách đơn (ĐH 1, Đh 2...) vào đây..."></textarea>
+            <label>Dán nội dung đơn hàng vào đây (Hỗ trợ tự trừ CK %):</label>
+            <textarea id="rawText" placeholder="Dán danh sách đơn (ĐH 1, Đh 2... có ghi ck 3% hay chiết khấu...) vào đây..."></textarea>
         </div>
 
         <button class="btn-primary" id="btnSubmit" onclick="processOrders()">⚡ Tính toán & Đồng bộ lên Drive</button>
@@ -284,7 +283,6 @@
 </div>
 
 <script>
-    // Dán URL Google Apps Script của bạn vào đây nếu cần đồng bộ Google Sheets:
     const GOOGLE_SHEET_URL = "";
 
     window.onload = function() {
@@ -316,7 +314,6 @@
         }
     }
 
-    // Quy tắc mùng 1 hàng tháng
     function applyMung1RuleIfDay1(d) {
         if (d === 1) {
             document.getElementById('workDay').value = 1;
@@ -335,7 +332,6 @@
         }
     }
 
-    // Hiển thị ngày/tháng/năm rõ ràng
     function updateDateDisplay() {
         const val = document.getElementById('reportDate').value;
         const preview = document.getElementById('datePreview');
@@ -359,19 +355,13 @@
         applyMung1RuleIfDay1(d);
     }
 
-    // Hàm lấy số ngày tối đa thực tế của tháng/năm
     function getMaxDaysInMonth(m, y) {
         if (!m) return 31;
-        if (m === 4 || m === 6 || m === 9 || m === 11) {
-            return 30;
-        }
-        if (m === 2) {
-            return (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) ? 29 : 28;
-        }
+        if (m === 4 || m === 6 || m === 9 || m === 11) return 30;
+        if (m === 2) return (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) ? 29 : 28;
         return 31;
     }
 
-    // Nút chủ động lấy ngày từ đoạn chat nếu muốn
     function autoDetectDateFromText() {
         const text = document.getElementById('rawText').value;
         if (!text) {
@@ -401,7 +391,6 @@
         }
     }
 
-    // THUẬT TOÁN TÍNH TOÁN NGÀY TIẾP THEO CHUẨN XÁC 100%
     function calculateNextDay(d, m, y) {
         const maxDays = getMaxDaysInMonth(m, y);
         let nextD = d + 1;
@@ -436,13 +425,69 @@
                 }
             }
         } else {
-            // Ngày đầu tiên: để trống hoàn toàn
             document.getElementById('reportDate').value = "";
             document.getElementById('prevRevenue').value = '';
             document.getElementById('prevOrders').value = '';
             document.getElementById('workDay').value = '';
             updateDateDisplay();
         }
+    }
+
+    // THUẬT TOÁN TÍNH TIỀN TỪNG ĐƠN HÀNG VÀ TỰ ĐỘNG TRỪ CHIẾT KHẤU (%)
+    function parseOrdersAndRevenue(text) {
+        const orderRegex = /(?:ĐH|Đh|DH|dh)\s*\d+[:\s]/gi;
+        const matches = [...text.matchAll(orderRegex)];
+        
+        let todayOrders = matches.length;
+        let todayRevenue = 0;
+
+        if (todayOrders === 0) {
+            // Trường hợp không có tiền tố ĐH, tính toàn bộ phép nhân trong văn bản
+            const lineRegex = /(\d+)\s*(?:bành|lốc|thùng|cuộn|gói|hộp)?\s*[x*]\s*([\d\.,]+)/gi;
+            let m;
+            while ((m = lineRegex.exec(text)) !== null) {
+                let qty = parseFloat(m[1]) || 0;
+                let price = parseFloat(m[2].replace(',', '.')) || 0;
+                todayRevenue += (qty * price);
+            }
+            return { orders: 0, revenue: Math.round(todayRevenue) };
+        }
+
+        // Chia văn bản thành các khối đơn hàng riêng biệt
+        for (let i = 0; i < matches.length; i++) {
+            const startIndex = matches[i].index;
+            const endIndex = (i + 1 < matches.length) ? matches[i + 1].index : text.length;
+            const orderContent = text.substring(startIndex, endIndex);
+
+            // 1. Tính tổng gộp của đơn
+            let orderTotal = 0;
+            const lineRegex = /(\d+)\s*(?:bành|lốc|thùng|cuộn|gói|hộp)?\s*[x*]\s*([\d\.,]+)/gi;
+            let lineMatch;
+            while ((lineMatch = lineRegex.exec(orderContent)) !== null) {
+                let qty = parseFloat(lineMatch[1]) || 0;
+                let price = parseFloat(lineMatch[2].replace(',', '.')) || 0;
+                orderTotal += (qty * price);
+            }
+
+            // 2. Kiểm tra chiết khấu trong đơn (VD: ck 3%, chiết khấu 5%, ck: 3%...)
+            let discountRate = 0;
+            const discountMatch = orderContent.match(/(?:ck|chiết\s*khấu)[\s:]*([0-9\.,]+)\s*%/i);
+            if (discountMatch) {
+                discountRate = (parseFloat(discountMatch[1].replace(',', '.')) || 0) / 100;
+            }
+
+            // 3. Trừ chiết khấu nếu có
+            if (discountRate > 0) {
+                orderTotal = orderTotal * (1 - discountRate);
+            }
+
+            todayRevenue += orderTotal;
+        }
+
+        return {
+            orders: todayOrders,
+            revenue: Math.round(todayRevenue)
+        };
     }
 
     async function processOrders() {
@@ -459,7 +504,6 @@
         }
         const [y, m, d] = dateVal.split('-').map(Number);
 
-        // Kiểm tra tính hợp lệ của ngày trong tháng
         const maxDays = getMaxDaysInMonth(m, y);
         if (d > maxDays) {
             alert(`⚠️ Lỗi: Tháng ${m} chỉ có tối đa ${maxDays} ngày! Không thể xuất báo cáo cho ngày ${d}/${m}/${y}.`);
@@ -468,23 +512,11 @@
 
         const displayDateStr = `${d}/${m}/${y}`;
 
-        // 1. Đếm đơn hàng
-        const orderMatches = text.match(/(?:ĐH|Đh|DH|dh)\s*\d+[:\s]/gi);
-        const todayOrders = orderMatches ? orderMatches.length : 0;
+        // Bóc tách đơn và tính doanh số (đã xử lý chiết khấu)
+        const parsed = parseOrdersAndRevenue(text);
+        const todayOrders = parsed.orders;
+        const todayRevenue = parsed.revenue;
 
-        // 2. Tính tiền các đơn
-        const lineRegex = /(\d+)\s*(?:bành|lốc|thùng|cuộn|gói|hộp)?\s*[x*]\s*([\d\.,]+)/gi;
-        let todayRevenue = 0;
-        let match;
-
-        while ((match = lineRegex.exec(text)) !== null) {
-            let qty = parseFloat(match[1]) || 0;
-            let price = parseFloat(match[2].replace(',', '.')) || 0;
-            todayRevenue += (qty * price);
-        }
-        todayRevenue = Math.round(todayRevenue);
-
-        // 3. Lấy số cũ và KPI
         const prevRev = parseFloat(document.getElementById('prevRevenue').value) || 0;
         const prevOrd = parseInt(document.getElementById('prevOrders').value) || 0;
         const workDay = parseInt(document.getElementById('workDay').value) || 1;
@@ -505,7 +537,6 @@
 
         const kpiMonthLabel = (kpiMonth >= 1000) ? (kpiMonth / 1000) + 'tr' : kpiMonth + 'k';
 
-        // 4. Xuất mẫu báo cáo chuẩn
         const report = 
 `Báo cáo bán hàng ngày:      ${displayDateStr}
 - NV: HÙNG DŨNG
@@ -520,11 +551,9 @@
         document.getElementById('reportOutput').innerText = report;
         document.getElementById('resultCard').style.display = 'block';
 
-        // 5. Lưu lịch sử
         saveToHistory(d, m, y, displayDateStr, workDay, todayOrders, todayRevenue, totalRev, totalOrd, deduction, text);
         document.getElementById('deductionAmount').value = 0;
 
-        // 6. Đồng bộ Google Drive
         const syncStatus = document.getElementById('syncStatus');
         if (GOOGLE_SHEET_URL && GOOGLE_SHEET_URL.startsWith("https://script.google.com")) {
             syncStatus.innerHTML = '<span style="color:#007aff;">⏳ Đang đồng bộ lên Google Drive...</span>';
@@ -578,7 +607,6 @@
         localStorage.setItem('hd_history', JSON.stringify(history));
         renderHistory();
 
-        // Tự động nhảy sang ngày tiếp theo
         const next = calculateNextDay(d, m, y);
         setCalendarDate(next.day, next.month, next.year);
 
