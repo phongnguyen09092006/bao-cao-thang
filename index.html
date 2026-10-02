@@ -166,7 +166,6 @@
             line-height: 1.5;
             color: #111;
         }
-        /* Lịch sử bấm vào xem được */
         .history-item {
             border-bottom: 1px solid #e5e5ea;
             padding: 10px 4px;
@@ -194,7 +193,6 @@
             color: var(--text-sub);
             padding-left: 6px;
         }
-        /* Popup Modal xem chi tiết */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -310,8 +308,8 @@
         </div>
 
         <div class="input-group" style="margin-top: 6px;">
-            <label>Dán nội dung đơn hàng vào đây (Hỗ trợ tự trừ CK %):</label>
-            <textarea id="rawText" placeholder="Dán danh sách đơn (ĐH 1, Đh 2... có ghi ck 3% hay chiết khấu...) vào đây..."></textarea>
+            <label>Dán nội dung đơn hàng vào đây (Tự trừ CK %):</label>
+            <textarea id="rawText" placeholder="Dán danh sách đơn (ĐH 1, Đh 2... có ck 3% hay ck 5%)..."></textarea>
         </div>
 
         <button class="btn-primary" id="btnSubmit" onclick="processOrders()">⚡ Tính toán & Đồng bộ lên Drive</button>
@@ -511,12 +509,15 @@
         }
     }
 
+    // TÍNH TIỀN TỪNG ĐƠN HÀNG, TỰ TRỪ CHIẾT KHẤU VÀ ĐẾM SỐ ĐƠN CK 3%, 5%
     function parseOrdersAndRevenue(text) {
         const orderRegex = /(?:ĐH|Đh|DH|dh)\s*\d+[:\s]/gi;
         const matches = [...text.matchAll(orderRegex)];
         
         let todayOrders = matches.length;
         let todayRevenue = 0;
+        let count3Percent = 0;
+        let count5Percent = 0;
 
         if (todayOrders === 0) {
             const lineRegex = /(\d+)\s*(?:bành|lốc|thùng|cuộn|gói|hộp)?\s*[x*]\s*([\d\.,]+)/gi;
@@ -526,7 +527,7 @@
                 let price = parseFloat(m[2].replace(',', '.')) || 0;
                 todayRevenue += (qty * price);
             }
-            return { orders: 0, revenue: Math.round(todayRevenue) };
+            return { orders: 0, revenue: Math.round(todayRevenue), count3: 0, count5: 0 };
         }
 
         for (let i = 0; i < matches.length; i++) {
@@ -543,14 +544,23 @@
                 orderTotal += (qty * price);
             }
 
-            let discountRate = 0;
-            const discountMatch = orderContent.match(/(?:ck|chiết\s*khấu)[\s:]*([0-9\.,]+)\s*%/i);
+            // Nhận diện chiết khấu (ck 3%, ck: 3%, chiết khấu 3%, ck 5%, chiết khấu 5%...)
+            let discountPercent = 0;
+            const discountMatch = orderContent.match(/(?:ck|chiết\s*khấu)[\s:]*([0-9\.,]+)\s*%/i)
+                               || orderContent.match(/(?:ck|chiết\s*khấu)[\s:]*([35])\b/i);
+
             if (discountMatch) {
-                discountRate = (parseFloat(discountMatch[1].replace(',', '.')) || 0) / 100;
+                discountPercent = parseFloat(discountMatch[1].replace(',', '.')) || 0;
             }
 
-            if (discountRate > 0) {
-                orderTotal = orderTotal * (1 - discountRate);
+            if (discountPercent === 3) {
+                count3Percent++;
+            } else if (discountPercent === 5) {
+                count5Percent++;
+            }
+
+            if (discountPercent > 0) {
+                orderTotal = orderTotal * (1 - (discountPercent / 100));
             }
 
             todayRevenue += orderTotal;
@@ -558,7 +568,9 @@
 
         return {
             orders: todayOrders,
-            revenue: Math.round(todayRevenue)
+            revenue: Math.round(todayRevenue),
+            count3: count3Percent,
+            count5: count5Percent
         };
     }
 
@@ -584,23 +596,30 @@
 
         const displayDateStr = `${d}/${m}/${y}`;
 
+        // 1. Phân tích đơn hàng và tính doanh số trước khi trừ rớt đơn
         const parsed = parseOrdersAndRevenue(text);
         const todayOrders = parsed.orders;
-        const todayRevenue = parsed.revenue;
+        const rawRevenue = parsed.revenue;
+        const deduction = parseFloat(document.getElementById('deductionAmount').value) || 0;
 
+        // 2. DOANH SỐ NGÀY THỰC TẾ = DOANH SỐ BÁN - TIỀN RỚT ĐƠN
+        const todayRevenue = Math.round(rawRevenue - deduction);
+
+        // 3. Đọc lũy kế cũ & KPI
         const prevRev = parseFloat(document.getElementById('prevRevenue').value) || 0;
         const prevOrd = parseInt(document.getElementById('prevOrders').value) || 0;
         const workDay = parseInt(document.getElementById('workDay').value) || 1;
-        const deduction = parseFloat(document.getElementById('deductionAmount').value) || 0;
 
         const kpiMonth = parseFloat(document.getElementById('kpiMonthRevenue').value) || 120000;
         const kpiDay = parseFloat(document.getElementById('kpiDayRevenue').value) || 4600;
         const kpiOrders = parseInt(document.getElementById('kpiTotalOrders').value) || 175;
         const kpiDays = parseInt(document.getElementById('kpiStandardDays').value) || 25;
 
-        const totalRev = prevRev + todayRevenue - deduction;
+        // TỔNG DOANH SỐ LŨY KẾ = LŨY KẾ CŨ + DOANH SỐ NGÀY THỰC TẾ
+        const totalRev = prevRev + todayRevenue;
         const totalOrd = prevOrd + todayOrders;
 
+        // 4. Tính tỷ lệ %
         const timeRate = Math.min(100, Math.round((workDay / kpiDays) * 100));
         const dayRate = Math.round((todayRevenue / kpiDay) * 100);
         const monthRate = Math.round((totalRev / kpiMonth) * 100);
@@ -608,24 +627,35 @@
 
         const kpiMonthLabel = (kpiMonth >= 1000) ? (kpiMonth / 1000) + 'tr' : kpiMonth + 'k';
 
-        const report = 
-`Báo cáo bán hàng ngày:      ${displayDateStr}
-- NV: HÙNG DŨNG
-- Tiến độ thời gian : ${workDay}/${kpiDays}/${timeRate}%
-- DS  bán giấy : ${todayRevenue}/${totalRev}/${kpiMonthLabel}
-- DS ngày : ${todayRevenue}/${kpiDay}/${dayRate}%
-- Tiến độ % đạt: ${monthRate}%
-- Đơn hàng: ${todayOrders}/${totalOrd}/${kpiOrders}/${orderRate}%
-- Trưng bày 3%: o
-- Trưng bày 5%: 0`;
+        // 5. Quy tắc hiển thị Trưng bày 3% và 5%
+        const tb3Str = parsed.count3 > 0 ? parsed.count3 : 'o';
+
+        let reportLines = [
+            `Báo cáo bán hàng ngày:      ${displayDateStr}`,
+            `- NV: HÙNG DŨNG`,
+            `- Tiến độ thời gian : ${workDay}/${kpiDays}/${timeRate}%`,
+            `- DS  bán giấy : ${todayRevenue}/${totalRev}/${kpiMonthLabel}`,
+            `- DS ngày : ${todayRevenue}/${kpiDay}/${dayRate}%`,
+            `- Tiến độ % đạt: ${monthRate}%`,
+            `- Đơn hàng: ${todayOrders}/${totalOrd}/${kpiOrders}/${orderRate}%`,
+            `- Trưng bày 3%: ${tb3Str}`
+        ];
+
+        // Nếu có đơn chiết khấu 5% thì hiện dòng kèm số lượng, không có thì bỏ hẳn dòng này
+        if (parsed.count5 > 0) {
+            reportLines.push(`- Trưng bày 5%: ${parsed.count5}`);
+        }
+
+        const report = reportLines.join('\n');
 
         document.getElementById('reportOutput').innerText = report;
         document.getElementById('resultCard').style.display = 'block';
 
-        // Lưu bản ghi kèm theo cả văn bản báo cáo đã xuất
+        // 6. Lưu lịch sử
         saveToHistory(d, m, y, displayDateStr, workDay, todayOrders, todayRevenue, totalRev, totalOrd, deduction, text, report);
         document.getElementById('deductionAmount').value = 0;
 
+        // 7. Đồng bộ Google Drive
         const syncStatus = document.getElementById('syncStatus');
         if (GOOGLE_SHEET_URL && GOOGLE_SHEET_URL.startsWith("https://script.google.com")) {
             syncStatus.innerHTML = '<span style="color:#007aff;">⏳ Đang đồng bộ lên Google Drive...</span>';
@@ -712,7 +742,6 @@
         `).join('');
     }
 
-    // MỞ CHI TIẾT ĐƠN HÀNG VÀ BÁO CÁO CỦA NGÀY TRONG LỊCH SỬ
     function openHistoryDetail(index) {
         const history = JSON.parse(localStorage.getItem('hd_history') || '[]');
         const item = history[index];
