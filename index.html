@@ -274,7 +274,25 @@
         </div>
     </div>
 
-    <!-- 2. DỮ LIỆU ĐƠN HÀNG HÔM NAY -->
+    <!-- 2. THEO DÕI TỔNG ĐƠN TRƯNG BÀY CHIẾT KHẤU TRONG THÁNG -->
+    <div class="card" style="background: #f0f7ff; border: 1px solid #b8daff;">
+        <div class="card-title" style="color: #0056b3; margin-bottom: 8px;">
+            <span>🏷️ Tổng Trưng Bày Tháng <span id="dispCurrentMonth">--</span></span>
+            <span style="font-size: 11.5px; font-weight: normal; color: #555;">(Tự reset Mùng 1)</span>
+        </div>
+        <div class="grid-2" style="margin-bottom: 0;">
+            <div style="background: #ffffff; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #cce5ff;">
+                <div style="font-size: 11.5px; color: var(--text-sub); font-weight: 600;">Trưng bày 3%</div>
+                <div id="monthCount3" style="font-size: 20px; font-weight: bold; color: var(--primary); margin-top: 3px;">0 đơn</div>
+            </div>
+            <div style="background: #ffffff; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #ffeeba;">
+                <div style="font-size: 11.5px; color: #856404; font-weight: 600;">Trưng bày 5%</div>
+                <div id="monthCount5" style="font-size: 20px; font-weight: bold; color: #d97706; margin-top: 3px;">0 đơn</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. DỮ LIỆU ĐƠN HÀNG HÔM NAY -->
     <div class="card">
         <div class="card-title">📝 Thông tin báo cáo</div>
         
@@ -308,22 +326,22 @@
         </div>
 
         <div class="input-group" style="margin-top: 6px;">
-            <label>Dán nội dung đơn hàng vào đây (Tự trừ CK %):</label>
-            <textarea id="rawText" placeholder="Dán danh sách đơn (ĐH 1, Đh 2... có ck 3% hay ck 5%)..."></textarea>
+            <label>Dán nội dung đơn hàng vào đây (Nhận diện Đơn, Đơn hàng, ĐH, DH...):</label>
+            <textarea id="rawText" placeholder="Dán danh sách đơn (Đơn 1, Đơn hàng 2, ĐH 3, dh 4... có ck 3% hay ck 5%)..."></textarea>
         </div>
 
         <button class="btn-primary" id="btnSubmit" onclick="processOrders()">⚡ Tính toán & Đồng bộ lên Drive</button>
         <div id="syncStatus" class="status-sync"></div>
     </div>
 
-    <!-- 3. KẾT QUẢ XUẤT RA -->
+    <!-- 4. KẾT QUẢ XUẤT RA -->
     <div class="card" id="resultCard" style="display: none;">
         <div class="card-title">📋 Văn bản nộp báo cáo</div>
         <div class="result-box" id="reportOutput"></div>
         <button class="btn-copy" onclick="copyReport()">📋 Sao chép báo cáo gửi Zalo</button>
     </div>
 
-    <!-- 4. LỊCH SỬ & XUẤT BẢNG TÍNH -->
+    <!-- 5. LỊCH SỬ & XUẤT BẢNG TÍNH -->
     <div class="card">
         <div class="card-title">
             <span>📜 Lịch sử các ngày (Bấm vào ngày để xem lại)</span>
@@ -333,7 +351,7 @@
             <div id="historyList"></div>
             
             <button class="btn-excel" onclick="exportToCSV()">
-                📗 Tải file bảng tính (.CSV) về máy
+                📗 Tải file bảng tính (.CSV có tổng tháng)
             </button>
             
             <button style="background: var(--danger); color: white; padding: 6px; font-size: 12px; margin-top: 10px;" onclick="clearHistory()">Xóa toàn bộ lịch sử</button>
@@ -359,12 +377,14 @@
 </div>
 
 <script>
+    // Dán URL Google Apps Script Web App của bạn vào đây:
     const GOOGLE_SHEET_URL = "";
 
     window.onload = function() {
         loadKpiSettings();
         loadDataFromHistory();
         renderHistory();
+        updateMonthlyDisplayTotals();
         document.getElementById('deductionAmount').value = 0;
     };
 
@@ -406,6 +426,7 @@
             const d = parseInt(parts[2], 10);
             applyMung1RuleIfDay1(d);
         }
+        updateMonthlyDisplayTotals();
     }
 
     function updateDateDisplay() {
@@ -429,6 +450,7 @@
         document.getElementById('reportDate').value = `${yyyy}-${mm}-${dd}`;
         updateDateDisplay();
         applyMung1RuleIfDay1(d);
+        updateMonthlyDisplayTotals();
     }
 
     function getMaxDaysInMonth(m, y) {
@@ -509,9 +531,8 @@
         }
     }
 
-    // TÍNH TIỀN TỪNG ĐƠN HÀNG, TỰ TRỪ CHIẾT KHẤU VÀ ĐẾM SỐ ĐƠN CK 3%, 5%
     function parseOrdersAndRevenue(text) {
-        const orderRegex = /(?:ĐH|Đh|DH|dh)\s*\d+[:\s]/gi;
+        const orderRegex = /(?:đơn\s*hàng|đơn|đh|dh)\s*(?:\d+[:\s\.\-]|[:\.\-]|\d+\b)/gi;
         const matches = [...text.matchAll(orderRegex)];
         
         let todayOrders = matches.length;
@@ -544,7 +565,6 @@
                 orderTotal += (qty * price);
             }
 
-            // Nhận diện chiết khấu (ck 3%, ck: 3%, chiết khấu 3%, ck 5%, chiết khấu 5%...)
             let discountPercent = 0;
             const discountMatch = orderContent.match(/(?:ck|chiết\s*khấu)[\s:]*([0-9\.,]+)\s*%/i)
                                || orderContent.match(/(?:ck|chiết\s*khấu)[\s:]*([35])\b/i);
@@ -572,6 +592,48 @@
             count3: count3Percent,
             count5: count5Percent
         };
+    }
+
+    function updateMonthlyDisplayTotals() {
+        const dateVal = document.getElementById('reportDate').value;
+        let curMonth, curYear;
+        
+        if (dateVal) {
+            const parts = dateVal.split('-');
+            curYear = parseInt(parts[0], 10);
+            curMonth = parseInt(parts[1], 10);
+        } else {
+            const now = new Date();
+            curMonth = now.getMonth() + 1;
+            curYear = now.getFullYear();
+        }
+
+        document.getElementById('dispCurrentMonth').innerText = curMonth;
+
+        const history = JSON.parse(localStorage.getItem('hd_history') || '[]');
+        let total3 = 0;
+        let total5 = 0;
+
+        history.forEach(item => {
+            if (item.month === curMonth && item.year === curYear) {
+                if (item.count3 !== undefined) {
+                    total3 += (item.count3 || 0);
+                } else if (item.rawText) {
+                    const p = parseOrdersAndRevenue(item.rawText);
+                    total3 += p.count3;
+                }
+
+                if (item.count5 !== undefined) {
+                    total5 += (item.count5 || 0);
+                } else if (item.rawText) {
+                    const p = parseOrdersAndRevenue(item.rawText);
+                    total5 += p.count5;
+                }
+            }
+        });
+
+        document.getElementById('monthCount3').innerText = `${total3} đơn`;
+        document.getElementById('monthCount5').innerText = `${total5} đơn`;
     }
 
     async function processOrders() {
@@ -641,7 +703,6 @@
             `- Trưng bày 3%: ${tb3Str}`
         ];
 
-        // Nếu có đơn chiết khấu 5% thì hiện dòng kèm số lượng, không có thì bỏ hẳn dòng này
         if (parsed.count5 > 0) {
             reportLines.push(`- Trưng bày 5%: ${parsed.count5}`);
         }
@@ -651,9 +712,11 @@
         document.getElementById('reportOutput').innerText = report;
         document.getElementById('resultCard').style.display = 'block';
 
-        // 6. Lưu lịch sử
-        saveToHistory(d, m, y, displayDateStr, workDay, todayOrders, todayRevenue, totalRev, totalOrd, deduction, text, report);
+        // 6. Lưu lịch sử kèm số lượng đơn chiết khấu
+        saveToHistory(d, m, y, displayDateStr, workDay, todayOrders, todayRevenue, totalRev, totalOrd, deduction, text, report, parsed.count3, parsed.count5);
         document.getElementById('deductionAmount').value = 0;
+
+        updateMonthlyDisplayTotals();
 
         // 7. Đồng bộ Google Drive
         const syncStatus = document.getElementById('syncStatus');
@@ -672,6 +735,8 @@
                         deduction: deduction,
                         cumulative: totalRev,
                         cumulativeOrders: totalOrd,
+                        count3: parsed.count3,
+                        count5: parsed.count5,
                         rawText: text
                     })
                 });
@@ -689,7 +754,7 @@
         });
     }
 
-    function saveToHistory(d, m, y, dateStr, workDay, orders, revenue, cumulative, cumulativeOrders, deduction, rawText, reportText) {
+    function saveToHistory(d, m, y, dateStr, workDay, orders, revenue, cumulative, cumulativeOrders, deduction, rawText, reportText, count3, count5) {
         let history = JSON.parse(localStorage.getItem('hd_history') || '[]');
         
         history.unshift({
@@ -704,7 +769,9 @@
             cumulativeOrders: cumulativeOrders,
             deduction: deduction,
             rawText: rawText || '',
-            reportText: reportText || ''
+            reportText: reportText || '',
+            count3: count3 || 0,
+            count5: count5 || 0
         });
 
         localStorage.setItem('hd_history', JSON.stringify(history));
@@ -735,7 +802,7 @@
             <div class="history-item" onclick="openHistoryDetail(${index})">
                 <div class="history-meta">
                     <span><b>📅 ${item.date}</b> (${item.orders} đơn${item.deduction > 0 ? ` - trừ ${item.deduction}k` : ''})</span>
-                    <span style="font-size:11.5px; color:var(--text-sub);">DS ngày: <b>${item.revenue.toLocaleString('vi-VN')}k</b> | Lũy kế: <b>${item.cumulative.toLocaleString('vi-VN')}k</b></span>
+                    <span style="font-size:11.5px; color:var(--text-sub);">DS ngày: <b>${item.revenue.toLocaleString('vi-VN')}k</b> | Lũy kế: <b>${item.cumulative.toLocaleString('vi-VN')}k</b> | TB: 3%(${item.count3 || 0}) 5%(${item.count5 || 0})</span>
                 </div>
                 <div class="history-arrow">▶</div>
             </div>
@@ -765,6 +832,7 @@
         });
     }
 
+    // XUẤT CSV CÓ CỘT TRƯNG BÀY VÀ DÒNG TỔNG CỘNG THÁNG
     function exportToCSV() {
         const history = JSON.parse(localStorage.getItem('hd_history') || '[]');
         if (history.length === 0) {
@@ -773,12 +841,34 @@
         }
 
         let csvContent = "\uFEFF";
-        csvContent += "Ngày,Ngày công,Số đơn ngày,DS ngày (k),Tiền trừ rớt (k),DS lũy kế (k),Tổng đơn lũy kế\n";
+        csvContent += "Ngày,Ngày công,Số đơn ngày,DS ngày (k),Tiền trừ rớt (k),DS lũy kế (k),Tổng đơn lũy kế,Trưng bày 3%,Trưng bày 5%\n";
 
         const exportData = [...history].reverse();
+        
+        let sumOrders = 0;
+        let sumRevenue = 0;
+        let sumDeduction = 0;
+        let sumCount3 = 0;
+        let sumCount5 = 0;
+
         exportData.forEach(row => {
-            csvContent += `"${row.date}",${row.workDay},${row.orders},${row.revenue},${row.deduction || 0},${row.cumulative},${row.cumulativeOrders}\n`;
+            const rOrders = row.orders || 0;
+            const rRev = row.revenue || 0;
+            const rDeduct = row.deduction || 0;
+            const rCount3 = row.count3 || 0;
+            const rCount5 = row.count5 || 0;
+
+            sumOrders += rOrders;
+            sumRevenue += rRev;
+            sumDeduction += rDeduct;
+            sumCount3 += rCount3;
+            sumCount5 += rCount5;
+
+            csvContent += `"${row.date}",${row.workDay},${rOrders},${rRev},${rDeduct},${row.cumulative},${row.cumulativeOrders},${rCount3},${rCount5}\n`;
         });
+
+        // Dòng tính tổng cộng toàn bộ tháng
+        csvContent += `"TỔNG CỘNG THÁNG",,${sumOrders},${sumRevenue},${sumDeduction},,,${sumCount3},${sumCount5}\n`;
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
