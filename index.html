@@ -1,897 +1,807 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Báo Cáo Bán Hàng - HÙNG DŨNG</title>
-    <style>
-        :root {
-            --primary: #007aff;
-            --success: #34c759;
-            --danger: #ff3b30;
-            --excel: #107c41;
-            --bg: #f2f2f7;
-            --card-bg: #ffffff;
-            --text-main: #1c1c1e;
-            --text-sub: #6c6c70;
-            --border: #d1d1d6;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            padding: 14px;
-            display: flex;
-            justify-content: center;
-        }
-        .container {
-            width: 100%;
-            max-width: 480px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 14px;
-        }
-        .header h1 {
-            font-size: 19px;
-            margin: 0;
-            color: var(--text-main);
-        }
-        .header p {
-            font-size: 13px;
-            color: var(--text-sub);
-            margin: 3px 0 0;
-        }
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 14px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            margin-bottom: 12px;
-        }
-        .card-title {
-            font-size: 14.5px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-        .input-group {
-            margin-bottom: 6px;
-        }
-        .input-group label {
-            display: block;
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-sub);
-            margin-bottom: 3px;
-        }
-        input, textarea {
-            width: 100%;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 9px 10px;
-            font-size: 14px;
-            box-sizing: border-box;
-            background: #fff;
-            color: var(--text-main);
-        }
-        input[type="date"] {
-            cursor: pointer;
-            font-family: inherit;
-        }
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        .date-preview {
-            font-size: 12.5px;
-            font-weight: 600;
-            margin-top: 5px;
-            color: var(--primary);
-        }
-        .input-deduction {
-            border-color: #ff9500;
-            background-color: #fff9f0;
-            color: #d93800;
-            font-weight: 600;
-        }
-        textarea {
-            height: 140px;
-            resize: vertical;
-            font-family: monospace;
-            line-height: 1.4;
-        }
-        button {
-            width: 100%;
-            border: none;
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-            margin-top: 6px;
-        }
-        .btn-copy {
-            background-color: var(--success);
-            color: white;
-            margin-top: 8px;
-        }
-        .btn-excel {
-            background-color: var(--excel);
-            color: white;
-            margin-top: 8px;
-        }
-        .btn-toggle {
-            background: none;
-            border: none;
-            color: var(--primary);
-            font-size: 12.5px;
-            padding: 2px 4px;
-            width: auto;
-            font-weight: normal;
-        }
-        .status-sync {
-            font-size: 12px;
-            text-align: center;
-            margin-top: 6px;
-            font-weight: 500;
-        }
-        .result-box {
-            background: #f9f9fb;
-            border: 1px dashed var(--success);
-            border-radius: 8px;
-            padding: 12px;
-            font-family: monospace;
-            font-size: 13.5px;
-            white-space: pre-wrap;
-            line-height: 1.5;
-            color: #111;
-        }
-        .history-item {
-            border-bottom: 1px solid #e5e5ea;
-            padding: 10px 4px;
-            font-size: 13px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: background 0.15s;
-        }
-        .history-item:active {
-            background-color: #e5e5ea;
-        }
-        .history-item:last-child {
-            border-bottom: none;
-        }
-        .history-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .history-arrow {
-            font-size: 13px;
-            color: var(--text-sub);
-            padding-left: 6px;
-        }
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            z-index: 999;
-        }
-        .modal-content {
-            background: #fff;
-            width: 100%;
-            max-width: 440px;
-            border-radius: 14px;
-            padding: 16px;
-            box-sizing: border-box;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .modal-header h3 {
-            margin: 0;
-            font-size: 16px;
-        }
-        .btn-close {
-            background: none;
-            border: none;
-            font-size: 20px;
-            color: #8e8e93;
-            width: auto;
-            padding: 0 4px;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Báo Cáo BH">
+  <meta name="theme-color" content="#007aff">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%23007aff'/><text x='96' y='125' font-size='90' text-anchor='middle' fill='white'>📊</text></svg>">
+  <title>Báo Cáo Bán Hàng - HÙNG DŨNG</title>
+  <style>
+    :root {
+      --bg: #f2f2f7;
+      --card-bg: #ffffff;
+      --text: #000000;
+      --text-muted: #8e8e93;
+      --blue: #007aff;
+      --green: #34c759;
+      --red: #ff3b30;
+      --orange: #ff9500;
+      --excel: #107c41;
+      --border: #e5e5ea;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+      padding-top: max(16px, env(safe-area-inset-top));
+      padding-bottom: max(40px, env(safe-area-inset-bottom));
+      -webkit-font-smoothing: antialiased;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    h1, h2, h3 { margin-top: 0; }
+    h3 { font-size: 17px; margin-bottom: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .input-group { margin-bottom: 12px; }
+    .input-group label {
+      display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #3a3a3c;
+    }
+    input, textarea {
+      width: 100%; padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px; font-size: 15px;
+      font-family: inherit; transition: border-color 0.2s;
+      background-color: #fafafa;
+      -webkit-appearance: none;
+    }
+    input:focus, textarea:focus {
+      outline: none; border-color: var(--blue); background-color: #fff;
+    }
+    .btn {
+      display: inline-flex; justify-content: center; align-items: center; gap: 8px;
+      width: 100%; padding: 12px;
+      font-size: 15px; font-weight: 600;
+      border: none; border-radius: 8px;
+      cursor: pointer; transition: opacity 0.2s, background-color 0.2s;
+    }
+    .btn:active { opacity: 0.8; }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-success { background: var(--green); color: #fff; }
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-secondary { background: #e5e5ea; color: var(--text); }
+    
+    .flex-row { display: flex; gap: 10px; }
+    .flex-1 { flex: 1; }
+    
+    .widget-container { display: flex; gap: 12px; }
+    .widget {
+      flex: 1; text-align: center; padding: 14px 10px;
+      border-radius: 10px; background: rgba(0, 122, 255, 0.08);
+      border: 1px solid rgba(0, 122, 255, 0.15);
+    }
+    .widget-title { font-size: 13px; color: var(--blue); font-weight: 600; margin-bottom: 4px; }
+    .widget-value { font-size: 26px; font-weight: 700; color: var(--blue); }
+    
+    .history-item {
+      padding: 12px 4px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.2s;
+      border-radius: 6px;
+    }
+    .history-item:hover { background: #fafafa; }
+    .history-item:last-child { border-bottom: none; }
+    .history-header { display: flex; justify-content: space-between; align-items: center; }
+    .history-date { font-weight: 600; font-size: 15px; color: var(--blue); }
+    .history-revenue { font-weight: 600; font-size: 15px; color: var(--green); }
+    .history-summary { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+    
+    /* Modal */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4); z-index: 100;
+      padding: 20px; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-content {
+      background: var(--card-bg); border-radius: var(--radius);
+      width: 100%; max-width: 440px; padding: 20px;
+      max-height: 90vh; overflow-y: auto; position: relative;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .modal.active { display: flex; }
+    .modal-close {
+      position: absolute; top: 15px; right: 15px; background: none; border: none;
+      font-size: 24px; line-height: 1; color: var(--text-muted); cursor: pointer;
+    }
+    
+    pre {
+      background: #f2f2f7; padding: 12px; border-radius: 8px;
+      white-space: pre-wrap; word-wrap: break-word; font-family: inherit; font-size: 13.5px;
+      line-height: 1.45; margin: 10px 0; border: 1px solid var(--border);
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>📊 Báo Cáo Bán Hàng</h1>
-        <p>NV: HÙNG DŨNG</p>
+  <!-- Header -->
+  <div class="header card" style="text-align: center; background: transparent; box-shadow: none; padding-bottom: 0;">
+    <h1 style="margin: 0; font-size: 24px; color: var(--blue);">📊 Báo Cáo Bán Hàng</h1>
+    <p style="margin: 4px 0 0; color: var(--text-muted); font-weight: 600;">NV: HÙNG DŨNG</p>
+  </div>
+
+  <!-- Card 1: Cài đặt chỉ tiêu tháng -->
+  <div class="card">
+    <h3>⚙️ Cài đặt chỉ tiêu tháng (KPI Settings)</h3>
+    <div class="flex-row">
+      <div class="input-group flex-1">
+        <label>Chỉ tiêu DS tháng (k)</label>
+        <input type="number" id="kpiMonthRevenue" value="120000">
+      </div>
+      <div class="input-group flex-1">
+        <label>Chỉ tiêu DS ngày (k)</label>
+        <input type="number" id="kpiDayRevenue" value="4600">
+      </div>
+    </div>
+    <div class="flex-row">
+      <div class="input-group flex-1">
+        <label>Chỉ tiêu tổng đơn</label>
+        <input type="number" id="kpiTotalOrders" value="175">
+      </div>
+      <div class="input-group flex-1">
+        <label>Số ngày công chuẩn</label>
+        <input type="number" id="kpiStandardDays" value="25">
+      </div>
+    </div>
+    <div class="input-group" style="margin-bottom: 0;">
+      <label>Google Apps Script API Endpoint (đồng bộ Drive)</label>
+      <input type="text" id="apiEndpoint" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+  </div>
+
+  <!-- Card 2: Thống kê Trưng bày theo tháng -->
+  <div class="card">
+    <h3>📈 Thống kê Trưng bày theo tháng (Monthly Discount Widget)</h3>
+    <div class="widget-container">
+      <div class="widget">
+        <div class="widget-title">Trưng bày 3%</div>
+        <div class="widget-value" id="display3Count">0</div>
+      </div>
+      <div class="widget">
+        <div class="widget-title">Trưng bày 5%</div>
+        <div class="widget-value" id="display5Count">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3: Form nhập dữ liệu báo cáo hàng ngày -->
+  <div class="card">
+    <h3>📝 Nhập dữ liệu báo cáo hàng ngày</h3>
+    <div class="input-group">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <label style="margin: 0;">Ngày báo cáo</label>
+        <button id="btnNextDay" class="btn btn-secondary" style="width: auto; padding: 4px 10px; font-size: 12px; border-radius: 6px;">➡️ Sang ngày tiếp theo</button>
+      </div>
+      <input type="date" id="reportDate">
+      <div id="dateNotice" style="font-size: 13px; color: var(--green); margin-top: 6px; font-weight: 600;"></div>
+    </div>
+    
+    <div class="flex-row" style="margin-bottom: 12px;">
+      <div class="input-group flex-1">
+        <label>Ngày công</label>
+        <input type="number" id="workDay" value="1" min="1">
+      </div>
+      <div class="input-group flex-1">
+        <label>DS cũ (k)</label>
+        <input type="number" id="cumulative" value="0" step="any">
+      </div>
+      <div class="input-group flex-1">
+        <label>Đơn cũ</label>
+        <input type="number" id="cumulativeOrders" value="0" min="0">
+      </div>
     </div>
 
-    <!-- 1. CÀI ĐẶT CHỈ TIÊU (KPI) - TỰ ĐỘNG LƯU -->
-    <div class="card">
-        <div class="card-title">
-            <span>🎯 Chỉ tiêu tháng (KPI)</span>
-        </div>
-        <div>
-            <div class="grid-2">
-                <div class="input-group">
-                    <label>DS bán giấy (tháng - k):</label>
-                    <input type="number" id="kpiMonthRevenue" value="120000" oninput="saveKpiSettings()">
-                </div>
-                <div class="input-group">
-                    <label>Chỉ tiêu DS ngày (k):</label>
-                    <input type="number" id="kpiDayRevenue" value="4600" oninput="saveKpiSettings()">
-                </div>
-            </div>
-            <div class="grid-2">
-                <div class="input-group">
-                    <label>Tổng đơn hoàn thành:</label>
-                    <input type="number" id="kpiTotalOrders" value="175" oninput="saveKpiSettings()">
-                </div>
-                <div class="input-group">
-                    <label>Ngày công chuẩn:</label>
-                    <input type="number" id="kpiStandardDays" value="25" oninput="saveKpiSettings()">
-                </div>
-            </div>
-        </div>
+    <div class="input-group">
+      <label style="color: var(--orange); font-weight: bold;">Tiền rớt đơn kế toán báo trừ (k)</label>
+      <input type="number" id="deduction" value="0" style="border-color: var(--orange); border-width: 2px;" step="any">
     </div>
 
-    <!-- 2. THEO DÕI TỔNG ĐƠN TRƯNG BÀY CHIẾT KHẤU TRONG THÁNG -->
-    <div class="card" style="background: #f0f7ff; border: 1px solid #b8daff;">
-        <div class="card-title" style="color: #0056b3; margin-bottom: 8px;">
-            <span>🏷️ Tổng Trưng Bày Tháng <span id="dispCurrentMonth">--</span></span>
-            <span style="font-size: 11.5px; font-weight: normal; color: #555;">(Tự reset Mùng 1)</span>
-        </div>
-        <div class="grid-2" style="margin-bottom: 0;">
-            <div style="background: #ffffff; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #cce5ff;">
-                <div style="font-size: 11.5px; color: var(--text-sub); font-weight: 600;">Trưng bày 3%</div>
-                <div id="monthCount3" style="font-size: 20px; font-weight: bold; color: var(--primary); margin-top: 3px;">0 đơn</div>
-            </div>
-            <div style="background: #ffffff; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #ffeeba;">
-                <div style="font-size: 11.5px; color: #856404; font-weight: 600;">Trưng bày 5%</div>
-                <div id="monthCount5" style="font-size: 20px; font-weight: bold; color: #d97706; margin-top: 3px;">0 đơn</div>
-            </div>
-        </div>
+    <div class="input-group">
+      <label>Nội dung đơn hàng (tổng hợp từ Zalo)</label>
+      <textarea id="rawText" rows="6" placeholder="Dán tin nhắn đơn hàng từ Zalo vào đây..."></textarea>
     </div>
 
-    <!-- 3. DỮ LIỆU ĐƠN HÀNG HÔM NAY -->
-    <div class="card">
-        <div class="card-title">📝 Thông tin báo cáo</div>
-        
-        <div class="input-group">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <label style="margin: 0;">📅 Chọn ngày báo cáo:</label>
-                <button type="button" class="btn-toggle" onclick="autoDetectDateFromText()">🔍 Lấy ngày từ text</button>
-            </div>
-            <input type="date" id="reportDate" onchange="handleDateChange()" style="margin-top: 4px;">
-            <div id="datePreview" class="date-preview">⚠️ Chưa chọn ngày báo cáo</div>
-        </div>
+    <button id="btnParseDate" class="btn btn-secondary" style="margin-bottom: 12px;">🔍 Lấy ngày từ text</button>
+    <button id="btnCalculate" class="btn btn-primary">⚡ Tính toán & Đồng bộ lên Drive</button>
+  </div>
 
-        <div class="grid-3" style="margin-top: 10px;">
-            <div class="input-group">
-                <label>Ngày công:</label>
-                <input type="number" id="workDay" placeholder="Để trống">
-            </div>
-            <div class="input-group">
-                <label>DS cũ (k):</label>
-                <input type="number" id="prevRevenue" placeholder="Để trống">
-            </div>
-            <div class="input-group">
-                <label>Đơn cũ:</label>
-                <input type="number" id="prevOrders" placeholder="Để trống">
-            </div>
-        </div>
+  <!-- Card 4: Kết quả xuất báo cáo -->
+  <div class="card" id="reportResultCard" style="display: none;">
+    <h3>📋 Kết quả xuất báo cáo</h3>
+    <pre id="reportOutput"></pre>
+    <button id="btnCopy" class="btn btn-success" style="margin-top: 10px;">📋 Sao chép báo cáo gửi Zalo</button>
+    <div id="syncStatus" style="margin-top: 12px; text-align: center; font-size: 13.5px; color: var(--text-muted); font-weight: 500;"></div>
+  </div>
 
-        <div class="input-group" style="margin-top: 4px;">
-            <label style="color: #d93800; font-weight: 600;">⚠️ Tiền rớt đơn kế toán báo trừ (k):</label>
-            <input type="number" id="deductionAmount" class="input-deduction" value="0" placeholder="Nhập số tiền trừ nếu có, không có để 0">
-        </div>
+  <!-- Card 5: Lịch sử & Tiện ích xuất dữ liệu -->
+  <div class="card">
+    <h3>🕒 Lịch sử & Tiện ích xuất dữ liệu</h3>
+    <button id="btnExportCSV" class="btn" style="background: var(--excel); color: white; margin-bottom: 12px;">📗 Tải file bảng tính (.CSV) về máy</button>
+    <button id="btnClearHistory" class="btn btn-danger" style="margin-bottom: 16px;">🗑️ Xóa toàn bộ lịch sử</button>
+    
+    <div id="historyList"></div>
+  </div>
 
-        <div class="input-group" style="margin-top: 6px;">
-            <label>Dán nội dung đơn hàng vào đây (Nhận diện Đơn, Đơn hàng, ĐH, DH...):</label>
-            <textarea id="rawText" placeholder="Dán danh sách đơn (Đơn 1, Đơn hàng 2, ĐH 3, dh 4... có ck 3% hay ck 5%)..."></textarea>
-        </div>
-
-        <button class="btn-primary" id="btnSubmit" onclick="processOrders()">⚡ Tính toán & Đồng bộ lên Drive</button>
-        <div id="syncStatus" class="status-sync"></div>
+  <!-- Modal Popup xem chi tiết ngày -->
+  <div class="modal" id="detailModal">
+    <div class="modal-content">
+      <button class="modal-close" id="btnCloseModal">×</button>
+      <h3 style="margin-bottom: 10px; color: var(--blue);">Chi tiết báo cáo</h3>
+      <div id="modalDate" style="font-weight: 600; margin-bottom: 10px; font-size: 15px;"></div>
+      
+      <label style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Văn bản báo cáo hoàn chỉnh:</label>
+      <pre id="modalReportText"></pre>
+      <button class="btn btn-success" id="btnModalCopyReport" style="padding: 10px; font-size: 14px; margin-bottom: 14px;">📋 Sao chép báo cáo gửi Zalo</button>
+      
+      <label style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Nội dung tin nhắn đơn hàng gốc:</label>
+      <pre id="modalRawText" style="max-height: 150px; overflow-y: auto;"></pre>
+      <button class="btn btn-secondary" id="btnModalCopyRaw" style="padding: 10px; font-size: 14px;">📋 Sao chép đơn hàng gốc</button>
     </div>
+  </div>
 
-    <!-- 4. KẾT QUẢ XUẤT RA -->
-    <div class="card" id="resultCard" style="display: none;">
-        <div class="card-title">📋 Văn bản nộp báo cáo</div>
-        <div class="result-box" id="reportOutput"></div>
-        <button class="btn-copy" onclick="copyReport()">📋 Sao chép báo cáo gửi Zalo</button>
-    </div>
-
-    <!-- 5. LỊCH SỬ & XUẤT BẢNG TÍNH -->
-    <div class="card">
-        <div class="card-title">
-            <span>📜 Lịch sử các ngày (Bấm vào ngày để xem lại)</span>
-            <button class="btn-toggle" onclick="toggleElement('historyBox')">Xem/Ẩn</button>
-        </div>
-        <div id="historyBox">
-            <div id="historyList"></div>
-            
-            <button class="btn-excel" onclick="exportToCSV()">
-                📗 Tải file bảng tính (.CSV có tổng tháng)
-            </button>
-            
-            <button style="background: var(--danger); color: white; padding: 6px; font-size: 12px; margin-top: 10px;" onclick="clearHistory()">Xóa toàn bộ lịch sử</button>
-        </div>
-    </div>
-</div>
-
-<!-- POPUP XEM LẠI BÁO CÁO CỦA TỪNG NGÀY ĐÃ LƯU -->
-<div id="historyModal" class="modal-overlay" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <div class="modal-header">
-            <h3 id="modalTitle">Chi tiết báo cáo</h3>
-            <button class="btn-close" onclick="closeModal()">&times;</button>
-        </div>
-        <div class="result-box" id="modalReportOutput"></div>
-        <button class="btn-copy" id="modalCopyBtn" onclick="copyModalReport()">📋 Sao chép lại báo cáo này</button>
-        
-        <div style="margin-top: 14px;">
-            <label style="font-size: 11px; font-weight: 600; color: var(--text-sub);">Nội dung đơn hàng đã nhập:</label>
-            <div id="modalRawText" style="margin-top: 4px; padding: 8px; background: #f2f2f7; border-radius: 8px; font-size: 12px; max-height: 120px; overflow-y: auto; white-space: pre-wrap; font-family: monospace;"></div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // Dán URL Google Apps Script Web App của bạn vào đây:
-    const GOOGLE_SHEET_URL = "";
-
-    window.onload = function() {
-        loadKpiSettings();
-        loadDataFromHistory();
-        renderHistory();
-        updateMonthlyDisplayTotals();
-        document.getElementById('deductionAmount').value = 0;
+  <script>
+    // -------------------------------------------------------------
+    // 1. Cấu hình & Trạng thái lưu trữ (localStorage)
+    // -------------------------------------------------------------
+    const STATE_KEYS = {
+      kpiMonthRevenue: 'kpiMonthRevenue',
+      kpiDayRevenue: 'kpiDayRevenue',
+      kpiTotalOrders: 'kpiTotalOrders',
+      kpiStandardDays: 'kpiStandardDays',
+      apiEndpoint: 'apiEndpoint',
+      history: 'reportHistory'
     };
 
-    function saveKpiSettings() {
-        localStorage.setItem('hd_kpi_month', document.getElementById('kpiMonthRevenue').value);
-        localStorage.setItem('hd_kpi_day', document.getElementById('kpiDayRevenue').value);
-        localStorage.setItem('hd_kpi_orders', document.getElementById('kpiTotalOrders').value);
-        localStorage.setItem('hd_kpi_days', document.getElementById('kpiStandardDays').value);
-    }
+    const DEFAULT_KPI = {
+      kpiMonthRevenue: 120000,
+      kpiDayRevenue: 4600,
+      kpiTotalOrders: 175,
+      kpiStandardDays: 25,
+      apiEndpoint: ''
+    };
 
-    function loadKpiSettings() {
-        if (localStorage.getItem('hd_kpi_month') !== null) {
-            document.getElementById('kpiMonthRevenue').value = localStorage.getItem('hd_kpi_month');
-        }
-        if (localStorage.getItem('hd_kpi_day') !== null) {
-            document.getElementById('kpiDayRevenue').value = localStorage.getItem('hd_kpi_day');
-        }
-        if (localStorage.getItem('hd_kpi_orders') !== null) {
-            document.getElementById('kpiTotalOrders').value = localStorage.getItem('hd_kpi_orders');
-        }
-        if (localStorage.getItem('hd_kpi_days') !== null) {
-            document.getElementById('kpiStandardDays').value = localStorage.getItem('hd_kpi_days');
-        }
-    }
+    let historyData = JSON.parse(localStorage.getItem(STATE_KEYS.history)) || [];
 
-    function applyMung1RuleIfDay1(d) {
-        if (d === 1) {
-            document.getElementById('workDay').value = 1;
-            document.getElementById('prevRevenue').value = 0;
-            document.getElementById('prevOrders').value = 0;
-        }
-    }
+    const fmt = (num) => Math.round(num * 10) / 10;
+    const fmtMonthKPI = (num) => (num >= 1000) ? fmt(num / 1000) + 'tr' : num + 'k';
 
-    function handleDateChange() {
-        updateDateDisplay();
-        const val = document.getElementById('reportDate').value;
-        if (val) {
-            const parts = val.split('-');
-            const d = parseInt(parts[2], 10);
-            applyMung1RuleIfDay1(d);
-        }
-        updateMonthlyDisplayTotals();
-    }
-
-    function updateDateDisplay() {
-        const val = document.getElementById('reportDate').value;
-        const preview = document.getElementById('datePreview');
-        if (!val) {
-            preview.innerHTML = '<span style="color:#ff3b30;">⚠️ Chưa chọn ngày báo cáo (Bấm vào ô lịch bên trên để chọn)</span>';
-            return;
-        }
-        const parts = val.split('-');
-        const y = parseInt(parts[0], 10);
-        const m = parseInt(parts[1], 10);
-        const d = parseInt(parts[2], 10);
-        preview.innerHTML = `✅ Đã chọn: Ngày <b>${d}</b> tháng <b>${m}</b> năm <b>${y}</b> (${d}/${m}/${y})`;
-    }
-
-    function setCalendarDate(d, m, y) {
-        const yyyy = y;
-        const mm = String(m).padStart(2, '0');
-        const dd = String(d).padStart(2, '0');
-        document.getElementById('reportDate').value = `${yyyy}-${mm}-${dd}`;
-        updateDateDisplay();
-        applyMung1RuleIfDay1(d);
-        updateMonthlyDisplayTotals();
-    }
-
-    function getMaxDaysInMonth(m, y) {
-        if (!m) return 31;
-        if (m === 4 || m === 6 || m === 9 || m === 11) return 30;
-        if (m === 2) return (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) ? 29 : 28;
-        return 31;
-    }
-
-    function autoDetectDateFromText() {
-        const text = document.getElementById('rawText').value;
-        if (!text) {
-            alert("Vui lòng dán văn bản đơn hàng trước!");
-            return;
-        }
-        let match = text.match(/(?:ngày[:\s]+)(\d{1,2})[\/\.\-](\d{1,2})(?:[\/\.\-](\d{2,4}))?/i);
-        if (!match) {
-            match = text.match(/(?:^|\n)\s*(\d{1,2})[\/\.\-](\d{1,2})(?:[\/\.\-](\d{2,4}))?/);
-        }
-        if (match) {
-            const d = parseInt(match[1], 10);
-            const m = parseInt(match[2], 10);
-            let y = match[3] ? parseInt(match[3], 10) : 2026;
-            if (y < 100) y += 2000;
-
-            const maxDays = getMaxDaysInMonth(m, y);
-            if (d > maxDays) {
-                alert(`⚠️ Lỗi: Tháng ${m} chỉ có tối đa ${maxDays} ngày, không có ngày ${d}/${m}!`);
-                return;
-            }
-
-            setCalendarDate(d, m, y);
-            alert(`Đã chọn ngày: ${d}/${m}/${y}`);
-        } else {
-            alert("Không tìm thấy ngày trong văn bản!");
-        }
-    }
-
+    // -------------------------------------------------------------
+    // 2. Quy tắc chuyển ngày & Năm nhuận (calculateNextDay)
+    // -------------------------------------------------------------
     function calculateNextDay(d, m, y) {
-        const maxDays = getMaxDaysInMonth(m, y);
-        let nextD = d + 1;
-        let nextM = m;
-        let nextY = y;
+      const isLeap = (y % 400 === 0) || (y % 4 === 0 && y % 100 !== 0);
+      const daysInMonth = [0, 31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+      let nextD = d + 1;
+      let nextM = m;
+      let nextY = y;
 
-        if (nextD > maxDays) {
-            nextD = 1;
-            nextM += 1;
-            if (nextM > 12) {
-                nextM = 1;
-                nextY += 1;
-            }
+      if (nextD > daysInMonth[m]) {
+        nextD = 1;
+        nextM = m + 1;
+        if (nextM > 12) {
+          nextM = 1;
+          nextY = y + 1;
         }
-        return { day: nextD, month: nextM, year: nextY };
+      }
+      return { d: nextD, m: nextM, y: nextY, isFirstOfMonth: nextD === 1 };
     }
 
-    function loadDataFromHistory() {
-        const history = JSON.parse(localStorage.getItem('hd_history') || '[]');
-        if (history.length > 0) {
-            const last = history[0];
-            if (last.day && last.month && last.year) {
-                const next = calculateNextDay(last.day, last.month, last.year);
-                setCalendarDate(next.day, next.month, next.year);
-
-                if (next.day === 1) {
-                    applyMung1RuleIfDay1(1);
-                } else {
-                    document.getElementById('prevRevenue').value = last.cumulative;
-                    document.getElementById('prevOrders').value = last.cumulativeOrders;
-                    document.getElementById('workDay').value = (parseInt(last.workDay, 10) || 0) + 1;
-                }
-            }
-        } else {
-            document.getElementById('reportDate').value = "";
-            document.getElementById('prevRevenue').value = '';
-            document.getElementById('prevOrders').value = '';
-            document.getElementById('workDay').value = '';
-            updateDateDisplay();
+    // -------------------------------------------------------------
+    // 3. Khởi tạo & Đồng bộ Form
+    // -------------------------------------------------------------
+    function init() {
+      // Tải và lắng nghe cài đặt KPI
+      Object.keys(DEFAULT_KPI).forEach(key => {
+        const val = localStorage.getItem(key) || DEFAULT_KPI[key];
+        const el = document.getElementById(key);
+        if (el) {
+          el.value = val;
+          el.addEventListener('input', (e) => {
+            localStorage.setItem(key, e.target.value);
+          });
         }
+      });
+
+      // Mặc định ngày hôm nay
+      const today = new Date();
+      setReportDate(today);
+      updateHistoryUI();
     }
 
-    function parseOrdersAndRevenue(text) {
-        const orderRegex = /(?:đơn\s*hàng|đơn|đh|dh)\s*(?:\d+[:\s\.\-]|[:\.\-]|\d+\b)/gi;
-        const matches = [...text.matchAll(orderRegex)];
-        
-        let todayOrders = matches.length;
-        let todayRevenue = 0;
-        let count3Percent = 0;
-        let count5Percent = 0;
+    function setReportDate(dateObj) {
+      const offset = dateObj.getTimezoneOffset();
+      const localDate = new Date(dateObj.getTime() - (offset * 60 * 1000));
+      const dateString = localDate.toISOString().split('T')[0];
+      document.getElementById('reportDate').value = dateString;
+      handleDateChange(dateObj);
+    }
 
-        if (todayOrders === 0) {
-            const lineRegex = /(\d+)\s*(?:bành|lốc|thùng|cuộn|gói|hộp)?\s*[x*]\s*([\d\.,]+)/gi;
-            let m;
-            while ((m = lineRegex.exec(text)) !== null) {
-                let qty = parseFloat(m[1]) || 0;
-                let price = parseFloat(m[2].replace(',', '.')) || 0;
-                todayRevenue += (qty * price);
-            }
-            return { orders: 0, revenue: Math.round(todayRevenue), count3: 0, count5: 0 };
+    function handleDateChange(dateObj) {
+      const d = dateObj.getDate();
+      const m = dateObj.getMonth() + 1;
+      const y = dateObj.getFullYear();
+      document.getElementById('dateNotice').innerText = `✅ Đã chọn: Ngày ${d} tháng ${m} năm ${y}`;
+      
+      updateMonthlyWidgets(m, y);
+      autoFillNextDayData(dateObj);
+    }
+
+    document.getElementById('reportDate').addEventListener('change', (e) => {
+      if (e.target.value) {
+        const parts = e.target.value.split('-');
+        const dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        handleDateChange(dateObj);
+      }
+    });
+
+    // Nút sang ngày tiếp theo
+    document.getElementById('btnNextDay').addEventListener('click', () => {
+      const currentDateVal = document.getElementById('reportDate').value;
+      if (!currentDateVal) return;
+      const parts = currentDateVal.split('-');
+      const y = parseInt(parts[0]);
+      const m = parseInt(parts[1]);
+      const d = parseInt(parts[2]);
+      const next = calculateNextDay(d, m, y);
+      const nextDateObj = new Date(next.y, next.m - 1, next.d);
+      setReportDate(nextDateObj);
+    });
+
+    // -------------------------------------------------------------
+    // 4. Widget Trưng bày theo tháng & Tự động Mùng 1
+    // -------------------------------------------------------------
+    function updateMonthlyWidgets(month, year) {
+      let count3 = 0;
+      let count5 = 0;
+      historyData.forEach(item => {
+        const [d, m, y] = item.date.split('/');
+        if (parseInt(m) === month && parseInt(y) === year) {
+          count3 += item.count3 || 0;
+          count5 += item.count5 || 0;
         }
+      });
+      document.getElementById('display3Count').innerText = count3;
+      document.getElementById('display5Count').innerText = count5;
+    }
 
+    function autoFillNextDayData(dateObj) {
+      const targetMonth = dateObj.getMonth() + 1;
+      const targetYear = dateObj.getFullYear();
+      
+      // Quy tắc Mùng 1: Ngày công về 1, Doanh số cũ = 0, Đơn cũ = 0
+      if (dateObj.getDate() === 1) {
+        document.getElementById('workDay').value = 1;
+        document.getElementById('cumulative').value = 0;
+        document.getElementById('cumulativeOrders').value = 0;
+        return;
+      }
+
+      const reqTime = dateObj.getTime();
+      let latestReport = null;
+      let maxTime = 0;
+
+      historyData.forEach(item => {
+        const [d, m, y] = item.date.split('/');
+        if (parseInt(m) === targetMonth && parseInt(y) === targetYear) {
+          const itemDate = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+          if (itemDate.getTime() < reqTime && itemDate.getTime() > maxTime) {
+            maxTime = itemDate.getTime();
+            latestReport = item;
+          }
+        }
+      });
+
+      if (latestReport) {
+        document.getElementById('workDay').value = parseInt(latestReport.workDay) + 1;
+        document.getElementById('cumulative').value = latestReport.cumulative;
+        document.getElementById('cumulativeOrders').value = latestReport.cumulativeOrders;
+      } else {
+        document.getElementById('workDay').value = 1;
+        document.getElementById('cumulative').value = 0;
+        document.getElementById('cumulativeOrders').value = 0;
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 5. Bóc tách ngày từ text (parseDateFromText)
+    // -------------------------------------------------------------
+    function parseDateFromText(text) {
+      const textMatch = text.match(/ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})(?:\s+năm\s+(\d{2,4}))?/i);
+      if (textMatch) {
+        let d = parseInt(textMatch[1]);
+        let m = parseInt(textMatch[2]);
+        let y = textMatch[3] ? parseInt(textMatch[3]) : new Date().getFullYear();
+        if (y < 100) y += 2000;
+        return { d, m, y };
+      }
+
+      const numMatch = text.match(/(?:ngày\s+)?(\d{1,2})[\/\-\.](\d{1,2})(?:[\/\-\.](\d{2,4}))?/i);
+      if (numMatch) {
+        let d = parseInt(numMatch[1]);
+        let m = parseInt(numMatch[2]);
+        let y = numMatch[3] ? parseInt(numMatch[3]) : new Date().getFullYear();
+        if (y < 100) y += 2000;
+        return { d, m, y };
+      }
+      return null;
+    }
+
+    document.getElementById('btnParseDate').addEventListener('click', () => {
+      const text = document.getElementById('rawText').value;
+      const res = parseDateFromText(text);
+      if (res && res.d > 0 && res.d <= 31 && res.m > 0 && res.m <= 12) {
+        setReportDate(new Date(res.y, res.m - 1, res.d));
+      } else {
+        alert("Không tìm thấy ngày hợp lệ trong văn bản!");
+      }
+    });
+
+    // -------------------------------------------------------------
+    // 6. Phân tích giá, chiết khấu & Tính toán báo cáo
+    // -------------------------------------------------------------
+    function parsePrice(str) {
+      if (!str) return 0;
+      let s = str.trim();
+      // 3 chữ số sau dấu chấm/phẩy dạng 1.200 hoặc 1,200 -> 1200
+      if (/^\d+[.,]\d{3}$/.test(s)) {
+        return parseFloat(s.replace(/[.,]/g, ''));
+      }
+      // Dấu phẩy hoặc chấm thập phân dạng 35.5 hoặc 12,5
+      return parseFloat(s.replace(/,/g, '.'));
+    }
+
+    function splitOrders(text) {
+      const orderRegex = /(?:đơn\s*hàng|đơn|đh|dh)\s*(?:\d+[:\s\.\-]|[:\.\-]|\d+\b)/gi;
+      let matches = [];
+      let match;
+      while ((match = orderRegex.exec(text)) !== null) {
+        matches.push(match.index);
+      }
+      let orders = [];
+      if (matches.length === 0) {
+        orders.push(text);
+      } else {
         for (let i = 0; i < matches.length; i++) {
-            const startIndex = matches[i].index;
-            const endIndex = (i + 1 < matches.length) ? matches[i + 1].index : text.length;
-            const orderContent = text.substring(startIndex, endIndex);
-
-            let orderTotal = 0;
-            const lineRegex = /(\d+)\s*(?:bành|lốc|thùng|cuộn|gói|hộp)?\s*[x*]\s*([\d\.,]+)/gi;
-            let lineMatch;
-            while ((lineMatch = lineRegex.exec(orderContent)) !== null) {
-                let qty = parseFloat(lineMatch[1]) || 0;
-                let price = parseFloat(lineMatch[2].replace(',', '.')) || 0;
-                orderTotal += (qty * price);
-            }
-
-            let discountPercent = 0;
-            const discountMatch = orderContent.match(/(?:ck|chiết\s*khấu)[\s:]*([0-9\.,]+)\s*%/i)
-                               || orderContent.match(/(?:ck|chiết\s*khấu)[\s:]*([35])\b/i);
-
-            if (discountMatch) {
-                discountPercent = parseFloat(discountMatch[1].replace(',', '.')) || 0;
-            }
-
-            if (discountPercent === 3) {
-                count3Percent++;
-            } else if (discountPercent === 5) {
-                count5Percent++;
-            }
-
-            if (discountPercent > 0) {
-                orderTotal = orderTotal * (1 - (discountPercent / 100));
-            }
-
-            todayRevenue += orderTotal;
+          let start = matches[i];
+          let end = i === matches.length - 1 ? text.length : matches[i + 1];
+          orders.push(text.substring(start, end));
         }
-
-        return {
-            orders: todayOrders,
-            revenue: Math.round(todayRevenue),
-            count3: count3Percent,
-            count5: count5Percent
-        };
+      }
+      return orders;
     }
 
-    function updateMonthlyDisplayTotals() {
-        const dateVal = document.getElementById('reportDate').value;
-        let curMonth, curYear;
+    function detectDiscount(text) {
+      const hasCk5 = /(?:ck|chiết\s*khấu|chiet\s*khau)[\s:]*5(?:\%|\b)/i.test(text);
+      const hasCk3 = /(?:ck|chiết\s*khấu|chiet\s*khau)[\s:]*3(?:\%|\b)/i.test(text);
+      if (hasCk5) return 5;
+      if (hasCk3) return 3;
+      return 0;
+    }
+
+    document.getElementById('btnCalculate').addEventListener('click', () => {
+      const text = document.getElementById('rawText').value;
+      if (!text.trim()) {
+        alert("Vui lòng nhập nội dung đơn hàng!");
+        return;
+      }
+      
+      const orders = splitOrders(text);
+      let totalRevenue = 0;
+      let count3 = 0;
+      let count5 = 0;
+      let validOrderCount = 0;
+
+      const itemRegex = /(\d+)\s*(?:bành|lốc|thùng|cuộn|gói|hộp|bao|ram|cây|kg|xấp|banh|loc|thung|cuon|goi|hop)?\s*[x*]\s*([\d\.,]+)/gi;
+
+      orders.forEach(orderText => {
+        let orderTotal = 0;
+        let itemMatch;
+        let hasItems = false;
         
-        if (dateVal) {
-            const parts = dateVal.split('-');
-            curYear = parseInt(parts[0], 10);
-            curMonth = parseInt(parts[1], 10);
-        } else {
-            const now = new Date();
-            curMonth = now.getMonth() + 1;
-            curYear = now.getFullYear();
+        itemRegex.lastIndex = 0;
+        while ((itemMatch = itemRegex.exec(orderText)) !== null) {
+          hasItems = true;
+          let qty = parseInt(itemMatch[1]);
+          let price = parsePrice(itemMatch[2]);
+          if (!isNaN(qty) && !isNaN(price)) {
+            orderTotal += qty * price;
+          }
         }
 
-        document.getElementById('dispCurrentMonth').innerText = curMonth;
-
-        const history = JSON.parse(localStorage.getItem('hd_history') || '[]');
-        let total3 = 0;
-        let total5 = 0;
-
-        history.forEach(item => {
-            if (item.month === curMonth && item.year === curYear) {
-                if (item.count3 !== undefined) {
-                    total3 += (item.count3 || 0);
-                } else if (item.rawText) {
-                    const p = parseOrdersAndRevenue(item.rawText);
-                    total3 += p.count3;
-                }
-
-                if (item.count5 !== undefined) {
-                    total5 += (item.count5 || 0);
-                } else if (item.rawText) {
-                    const p = parseOrdersAndRevenue(item.rawText);
-                    total5 += p.count5;
-                }
-            }
-        });
-
-        document.getElementById('monthCount3').innerText = `${total3} đơn`;
-        document.getElementById('monthCount5').innerText = `${total5} đơn`;
-    }
-
-    async function processOrders() {
-        const text = document.getElementById('rawText').value;
-        if (!text.trim()) {
-            alert("Vui lòng dán nội dung đơn hàng!");
-            return;
+        if (hasItems) {
+          validOrderCount++;
+          const ck = detectDiscount(orderText);
+          if (ck === 5) {
+            orderTotal = orderTotal * 0.95;
+            count5++;
+          } else if (ck === 3) {
+            orderTotal = orderTotal * 0.97;
+            count3++;
+          }
+          totalRevenue += orderTotal;
         }
+      });
 
-        const dateVal = document.getElementById('reportDate').value;
-        if (!dateVal) {
-            alert("Vui lòng chọn ngày báo cáo từ ô lịch trước khi tính!");
-            return;
-        }
-        const [y, m, d] = dateVal.split('-').map(Number);
+      const deduction = parseFloat(document.getElementById('deduction').value) || 0;
+      const netRevenue = totalRevenue - deduction;
+      
+      const prevCumulative = parseFloat(document.getElementById('cumulative').value) || 0;
+      const newCumulative = prevCumulative + netRevenue;
+      
+      const prevOrders = parseInt(document.getElementById('cumulativeOrders').value) || 0;
+      const newOrders = prevOrders + validOrderCount;
+      
+      const workDay = parseInt(document.getElementById('workDay').value) || 1;
+      const kpiStandardDays = parseInt(document.getElementById('kpiStandardDays').value) || 25;
+      const kpiMonthRevenue = parseFloat(document.getElementById('kpiMonthRevenue').value) || 120000;
+      const kpiDayRevenue = parseFloat(document.getElementById('kpiDayRevenue').value) || 4600;
+      const kpiTotalOrders = parseInt(document.getElementById('kpiTotalOrders').value) || 175;
 
-        const maxDays = getMaxDaysInMonth(m, y);
-        if (d > maxDays) {
-            alert(`⚠️ Lỗi: Tháng ${m} chỉ có tối đa ${maxDays} ngày! Không thể xuất báo cáo cho ngày ${d}/${m}/${y}.`);
-            return;
-        }
+      const dateParts = document.getElementById('reportDate').value.split('-');
+      const dateStr = `${parseInt(dateParts[2])}/${parseInt(dateParts[1])}/${parseInt(dateParts[0])}`;
 
-        const displayDateStr = `${d}/${m}/${y}`;
+      const timeProgress = Math.round((workDay / kpiStandardDays) * 100);
+      const monthProgress = Math.round((newCumulative / kpiMonthRevenue) * 100);
+      const dayProgress = Math.round((netRevenue / kpiDayRevenue) * 100);
+      const orderProgress = Math.round((newOrders / kpiTotalOrders) * 100);
 
-        // 1. Phân tích đơn hàng và tính doanh số trước khi trừ rớt đơn
-        const parsed = parseOrdersAndRevenue(text);
-        const todayOrders = parsed.orders;
-        const rawRevenue = parsed.revenue;
-        const deduction = parseFloat(document.getElementById('deductionAmount').value) || 0;
+      // Tạo mẫu văn bản xuất ra gửi Zalo chuẩn theo SPEC mục 4
+      let reportText = `Báo cáo bán hàng ngày:      ${dateStr}\n\n`;
+      reportText += `- NV: HÙNG DŨNG\n\n`;
+      reportText += `- Tiến độ thời gian : ${workDay}/${kpiStandardDays}/${timeProgress}%\n\n`;
+      reportText += `- DS  bán giấy : ${fmt(netRevenue)}/${fmt(newCumulative)}/${fmtMonthKPI(kpiMonthRevenue)}\n\n`;
+      reportText += `- DS ngày : ${fmt(netRevenue)}/${kpiDayRevenue}/${dayProgress}%\n\n`;
+      reportText += `- Tiến độ % đạt: ${monthProgress}%\n\n`;
+      reportText += `- Đơn hàng: ${validOrderCount}/${newOrders}/${kpiTotalOrders}/${orderProgress}%\n\n`;
+      reportText += `- Trưng bày 3%: ${count3 > 0 ? count3 : 'o'}`;
+      if (count5 > 0) {
+        reportText += `\n\n- Trưng bày 5%: ${count5}`;
+      }
 
-        // 2. DOANH SỐ NGÀY THỰC TẾ = DOANH SỐ BÁN - TIỀN RỚT ĐƠN
-        const todayRevenue = Math.round(rawRevenue - deduction);
+      document.getElementById('reportOutput').innerText = reportText;
+      document.getElementById('reportResultCard').style.display = 'block';
 
-        // 3. Đọc lũy kế cũ & KPI
-        const prevRev = parseFloat(document.getElementById('prevRevenue').value) || 0;
-        const prevOrd = parseInt(document.getElementById('prevOrders').value) || 0;
-        const workDay = parseInt(document.getElementById('workDay').value) || 1;
+      // Lưu vào Lịch sử
+      const record = {
+        id: Date.now(),
+        date: dateStr,
+        workDay: workDay,
+        orders: validOrderCount,
+        revenue: netRevenue,
+        deduction: deduction,
+        cumulative: newCumulative,
+        cumulativeOrders: newOrders,
+        count3: count3,
+        count5: count5,
+        rawText: text,
+        reportText: reportText
+      };
 
-        const kpiMonth = parseFloat(document.getElementById('kpiMonthRevenue').value) || 120000;
-        const kpiDay = parseFloat(document.getElementById('kpiDayRevenue').value) || 4600;
-        const kpiOrders = parseInt(document.getElementById('kpiTotalOrders').value) || 175;
-        const kpiDays = parseInt(document.getElementById('kpiStandardDays').value) || 25;
+      // Ghi đè nếu cùng ngày
+      historyData = historyData.filter(h => h.date !== dateStr);
+      historyData.push(record);
+      historyData.sort((a, b) => {
+        let da = a.date.split('/'); let db = b.date.split('/');
+        let dateA = new Date(parseInt(da[2]), parseInt(da[1]) - 1, parseInt(da[0])).getTime();
+        let dateB = new Date(parseInt(db[2]), parseInt(db[1]) - 1, parseInt(db[0])).getTime();
+        if (dateB === dateA) return b.id - a.id;
+        return dateB - dateA;
+      });
+      
+      localStorage.setItem(STATE_KEYS.history, JSON.stringify(historyData));
+      updateHistoryUI();
+      updateMonthlyWidgets(parseInt(dateParts[1]), parseInt(dateParts[0]));
 
-        // TỔNG DOANH SỐ LŨY KẾ = LŨY KẾ CŨ + DOANH SỐ NGÀY THỰC TẾ
-        const totalRev = prevRev + todayRevenue;
-        const totalOrd = prevOrd + todayOrders;
+      // Tự động sao chép vào bộ nhớ tạm
+      copyToClipboard(reportText);
 
-        // 4. Tính tỷ lệ %
-        const timeRate = Math.min(100, Math.round((workDay / kpiDays) * 100));
-        const dayRate = Math.round((todayRevenue / kpiDay) * 100);
-        const monthRate = Math.round((totalRev / kpiMonth) * 100);
-        const orderRate = Math.round((totalOrd / kpiOrders) * 100);
+      // Đồng bộ lên Google Drive / Google Apps Script
+      syncToGoogleDrive(record);
+    });
 
-        const kpiMonthLabel = (kpiMonth >= 1000) ? (kpiMonth / 1000) + 'tr' : kpiMonth + 'k';
+    // -------------------------------------------------------------
+    // 7. Tiện ích Sao chép (Clipboard) & Đồng bộ Google Drive
+    // -------------------------------------------------------------
+    document.getElementById('btnCopy').addEventListener('click', () => {
+      copyToClipboard(document.getElementById('reportOutput').innerText);
+    });
 
-        // 5. Quy tắc hiển thị Trưng bày 3% và 5%
-        const tb3Str = parsed.count3 > 0 ? parsed.count3 : 'o';
-
-        let reportLines = [
-            `Báo cáo bán hàng ngày:      ${displayDateStr}`,
-            `- NV: HÙNG DŨNG`,
-            `- Tiến độ thời gian : ${workDay}/${kpiDays}/${timeRate}%`,
-            `- DS  bán giấy : ${todayRevenue}/${totalRev}/${kpiMonthLabel}`,
-            `- DS ngày : ${todayRevenue}/${kpiDay}/${dayRate}%`,
-            `- Tiến độ % đạt: ${monthRate}%`,
-            `- Đơn hàng: ${todayOrders}/${totalOrd}/${kpiOrders}/${orderRate}%`,
-            `- Trưng bày 3%: ${tb3Str}`
-        ];
-
-        if (parsed.count5 > 0) {
-            reportLines.push(`- Trưng bày 5%: ${parsed.count5}`);
-        }
-
-        const report = reportLines.join('\n');
-
-        document.getElementById('reportOutput').innerText = report;
-        document.getElementById('resultCard').style.display = 'block';
-
-        // 6. Lưu lịch sử kèm số lượng đơn chiết khấu
-        saveToHistory(d, m, y, displayDateStr, workDay, todayOrders, todayRevenue, totalRev, totalOrd, deduction, text, report, parsed.count3, parsed.count5);
-        document.getElementById('deductionAmount').value = 0;
-
-        updateMonthlyDisplayTotals();
-
-        // 7. Đồng bộ Google Drive
-        const syncStatus = document.getElementById('syncStatus');
-        if (GOOGLE_SHEET_URL && GOOGLE_SHEET_URL.startsWith("https://script.google.com")) {
-            syncStatus.innerHTML = '<span style="color:#007aff;">⏳ Đang đồng bộ lên Google Drive...</span>';
-            try {
-                await fetch(GOOGLE_SHEET_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        date: displayDateStr,
-                        workDay: workDay,
-                        orders: todayOrders,
-                        revenue: todayRevenue,
-                        deduction: deduction,
-                        cumulative: totalRev,
-                        cumulativeOrders: totalOrd,
-                        count3: parsed.count3,
-                        count5: parsed.count5,
-                        rawText: text
-                    })
-                });
-                syncStatus.innerHTML = '<span style="color:#34c759;">✅ Đã đồng bộ lên Google Sheet thành công!</span>';
-            } catch (err) {
-                syncStatus.innerHTML = '<span style="color:#ff3b30;">⚠️ Chưa đồng bộ lên Drive (Đã lưu an toàn trên máy).</span>';
-            }
-        }
-    }
-
-    function copyReport() {
-        const text = document.getElementById('reportOutput').innerText;
+    function copyToClipboard(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {
-            alert("Đã sao chép báo cáo! Bạn có thể dán gửi Zalo ngay.");
-        });
+          showSyncNotice("📋 Đã sao chép báo cáo vào bộ nhớ tạm!", "var(--green)");
+        }).catch(() => fallbackCopyTextToClipboard(text));
+      } else {
+        fallbackCopyTextToClipboard(text);
+      }
     }
 
-    function saveToHistory(d, m, y, dateStr, workDay, orders, revenue, cumulative, cumulativeOrders, deduction, rawText, reportText, count3, count5) {
-        let history = JSON.parse(localStorage.getItem('hd_history') || '[]');
-        
-        history.unshift({
-            day: d,
-            month: m,
-            year: y,
-            date: dateStr,
-            workDay: workDay,
-            orders: orders,
-            revenue: revenue,
-            cumulative: cumulative,
-            cumulativeOrders: cumulativeOrders,
-            deduction: deduction,
-            rawText: rawText || '',
-            reportText: reportText || '',
-            count3: count3 || 0,
-            count5: count5 || 0
-        });
-
-        localStorage.setItem('hd_history', JSON.stringify(history));
-        renderHistory();
-
-        const next = calculateNextDay(d, m, y);
-        setCalendarDate(next.day, next.month, next.year);
-
-        if (next.day === 1) {
-            applyMung1RuleIfDay1(1);
-        } else {
-            document.getElementById('prevRevenue').value = cumulative;
-            document.getElementById('prevOrders').value = cumulativeOrders;
-            document.getElementById('workDay').value = parseInt(workDay, 10) + 1;
-        }
-
-        document.getElementById('rawText').value = '';
+    function fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.top = "0"; textArea.style.left = "0"; textArea.style.position = "fixed";
+      document.body.appendChild(textArea);
+      textArea.focus(); textArea.select();
+      try {
+        document.execCommand('copy');
+        showSyncNotice("📋 Đã sao chép báo cáo vào bộ nhớ tạm!", "var(--green)");
+      } catch (err) {}
+      document.body.removeChild(textArea);
     }
 
-    function renderHistory() {
-        const history = JSON.parse(localStorage.getItem('hd_history') || '[]');
-        const container = document.getElementById('historyList');
-        if (history.length === 0) {
-            container.innerHTML = '<p style="color:#8e8e93; font-size:12px; margin:0;">Chưa có dữ liệu nào trong lịch sử.</p>';
-            return;
-        }
-        container.innerHTML = history.map((item, index) => `
-            <div class="history-item" onclick="openHistoryDetail(${index})">
-                <div class="history-meta">
-                    <span><b>📅 ${item.date}</b> (${item.orders} đơn${item.deduction > 0 ? ` - trừ ${item.deduction}k` : ''})</span>
-                    <span style="font-size:11.5px; color:var(--text-sub);">DS ngày: <b>${item.revenue.toLocaleString('vi-VN')}k</b> | Lũy kế: <b>${item.cumulative.toLocaleString('vi-VN')}k</b> | TB: 3%(${item.count3 || 0}) 5%(${item.count5 || 0})</span>
-                </div>
-                <div class="history-arrow">▶</div>
+    function showSyncNotice(msg, color) {
+      const el = document.getElementById('syncStatus');
+      if (el) {
+        el.innerText = msg;
+        el.style.color = color || "var(--text-muted)";
+      }
+    }
+
+    function syncToGoogleDrive(record) {
+      const endpoint = document.getElementById('apiEndpoint').value.trim();
+      if (!endpoint) {
+        showSyncNotice("Đã lưu báo cáo cục bộ (Chưa cấu hình Endpoint Google Sheets)", "var(--text-muted)");
+        return;
+      }
+
+      showSyncNotice("🔄 Đang đồng bộ lên Google Sheets...", "var(--blue)");
+      
+      // Gửi POST payload theo SPEC mục 5
+      const payload = {
+        date: record.date,
+        workDay: record.workDay,
+        orders: record.orders,
+        revenue: record.revenue,
+        deduction: record.deduction,
+        cumulative: record.cumulative,
+        cumulativeOrders: record.cumulativeOrders,
+        rawText: record.rawText,
+        count3: record.count3,
+        count5: record.count5
+      };
+
+      fetch(endpoint, {
+        method: 'POST',
+        mode: 'no-cors', // Tránh lỗi CORS preflight với Google Apps Script Web App
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      }).then(() => {
+        showSyncNotice("✅ Đồng bộ lên Google Sheets thành công!", "var(--green)");
+      }).catch(err => {
+        showSyncNotice("❌ Lỗi khi đồng bộ lên Google Sheets: " + err.message, "var(--red)");
+      });
+    }
+
+    // -------------------------------------------------------------
+    // 8. Danh sách Lịch sử & Modal chi tiết
+    // -------------------------------------------------------------
+    function updateHistoryUI() {
+      const list = document.getElementById('historyList');
+      list.innerHTML = '';
+      if (historyData.length === 0) {
+        list.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:14px; padding:12px;">Chưa có báo cáo nào.</div>';
+        return;
+      }
+
+      historyData.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'history-item';
+        el.innerHTML = `
+          <div style="flex:1">
+            <div class="history-header">
+              <span class="history-date">${item.date}</span>
+              <span class="history-revenue">${fmt(item.revenue)}k</span>
             </div>
-        `).join('');
+            <div class="history-summary">Đơn: ${item.orders} | T.Bày: ${item.count3} (3%), ${item.count5} (5%) | Lũy kế: ${fmt(item.cumulative)}k</div>
+          </div>
+        `;
+        el.addEventListener('click', () => openModal(item));
+        list.appendChild(el);
+      });
     }
 
-    function openHistoryDetail(index) {
-        const history = JSON.parse(localStorage.getItem('hd_history') || '[]');
-        const item = history[index];
-        if (!item) return;
+    const modal = document.getElementById('detailModal');
+    let currentModalItem = null;
 
-        document.getElementById('modalTitle').innerText = `Báo cáo ngày: ${item.date}`;
-        document.getElementById('modalReportOutput').innerText = item.reportText || "Không có nội dung báo cáo lưu kèm.";
-        document.getElementById('modalRawText').innerText = item.rawText || "(Không có nội dung đơn gốc)";
-        
-        document.getElementById('historyModal').style.display = 'flex';
+    function openModal(item) {
+      currentModalItem = item;
+      document.getElementById('modalDate').innerText = "Ngày: " + item.date;
+      document.getElementById('modalReportText').innerText = item.reportText || "Không có văn bản báo cáo.";
+      document.getElementById('modalRawText').innerText = item.rawText || "Không có đơn hàng gốc.";
+      modal.classList.add('active');
     }
 
-    function closeModal(e) {
-        document.getElementById('historyModal').style.display = 'none';
+    document.getElementById('btnCloseModal').addEventListener('click', () => {
+      modal.classList.remove('active');
+    });
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+
+    document.getElementById('btnModalCopyReport').addEventListener('click', () => {
+      if (currentModalItem && currentModalItem.reportText) {
+        copyToClipboard(currentModalItem.reportText);
+      }
+    });
+
+    document.getElementById('btnModalCopyRaw').addEventListener('click', () => {
+      if (currentModalItem && currentModalItem.rawText) {
+        copyToClipboard(currentModalItem.rawText);
+      }
+    });
+
+    // -------------------------------------------------------------
+    // 9. Tiện ích Xuất CSV & Xóa Lịch sử
+    // -------------------------------------------------------------
+    document.getElementById('btnClearHistory').addEventListener('click', () => {
+      if (confirm("⚠️ CẢNH BÁO: Bạn có chắc chắn muốn XÓA TOÀN BỘ LỊCH SỬ không? Cấu hình KPI sẽ được giữ nguyên.")) {
+        historyData = [];
+        localStorage.removeItem(STATE_KEYS.history);
+        updateHistoryUI();
+        const dateParts = document.getElementById('reportDate').value.split('-');
+        updateMonthlyWidgets(parseInt(dateParts[1]), parseInt(dateParts[0]));
+        alert("Đã xóa sạch lịch sử báo cáo!");
+      }
+    });
+
+    document.getElementById('btnExportCSV').addEventListener('click', () => {
+      if (historyData.length === 0) {
+        alert("Chưa có lịch sử để xuất file CSV!");
+        return;
+      }
+      
+      const headers = ["Ngày", "Ngày công", "Đơn trong ngày", "Tổng đơn", "DS ngày (k)", "Rớt đơn (k)", "DS lũy kế (k)", "Trưng bày 3%", "Trưng bày 5%", "Nội dung gốc"];
+      let csvContent = "\uFEFF"; // UTF-8 BOM cho Excel & Sheets
+      csvContent += headers.join(",") + "\n";
+      
+      historyData.forEach(item => {
+        let cleanRaw = item.rawText ? item.rawText.replace(/"/g, '""').replace(/\r?\n/g, ' ') : '';
+        const row = [
+          item.date,
+          item.workDay,
+          item.orders,
+          item.cumulativeOrders,
+          fmt(item.revenue),
+          item.deduction || 0,
+          fmt(item.cumulative),
+          item.count3 || 0,
+          item.count5 || 0,
+          `"${cleanRaw}"`
+        ];
+        csvContent += row.join(",") + "\n";
+      });
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `BaoCaoBanHang_HungDung_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    // -------------------------------------------------------------
+    // 10. Đăng ký Service Worker (PWA Offline)
+    // -------------------------------------------------------------
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
     }
 
-    function copyModalReport() {
-        const text = document.getElementById('modalReportOutput').innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            alert("Đã sao chép lại báo cáo của ngày này!");
-        });
-    }
-
-    // XUẤT CSV CÓ CỘT TRƯNG BÀY VÀ DÒNG TỔNG CỘNG THÁNG
-    function exportToCSV() {
-        const history = JSON.parse(localStorage.getItem('hd_history') || '[]');
-        if (history.length === 0) {
-            alert("Chưa có lịch sử để xuất bảng tính!");
-            return;
-        }
-
-        let csvContent = "\uFEFF";
-        csvContent += "Ngày,Ngày công,Số đơn ngày,DS ngày (k),Tiền trừ rớt (k),DS lũy kế (k),Tổng đơn lũy kế,Trưng bày 3%,Trưng bày 5%\n";
-
-        const exportData = [...history].reverse();
-        
-        let sumOrders = 0;
-        let sumRevenue = 0;
-        let sumDeduction = 0;
-        let sumCount3 = 0;
-        let sumCount5 = 0;
-
-        exportData.forEach(row => {
-            const rOrders = row.orders || 0;
-            const rRev = row.revenue || 0;
-            const rDeduct = row.deduction || 0;
-            const rCount3 = row.count3 || 0;
-            const rCount5 = row.count5 || 0;
-
-            sumOrders += rOrders;
-            sumRevenue += rRev;
-            sumDeduction += rDeduct;
-            sumCount3 += rCount3;
-            sumCount5 += rCount5;
-
-            csvContent += `"${row.date}",${row.workDay},${rOrders},${rRev},${rDeduct},${row.cumulative},${row.cumulativeOrders},${rCount3},${rCount5}\n`;
-        });
-
-        // Dòng tính tổng cộng toàn bộ tháng
-        csvContent += `"TỔNG CỘNG THÁNG",,${sumOrders},${sumRevenue},${sumDeduction},,,${sumCount3},${sumCount5}\n`;
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `Bao_Cao_Ban_Hang_${new Date().toISOString().slice(0,10)}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    function toggleElement(id) {
-        const el = document.getElementById(id);
-        el.style.display = (el.style.display === 'none') ? 'block' : 'none';
-    }
-
-    function clearHistory() {
-        if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử các ngày đã tính? (Các cài đặt KPI vẫn được giữ nguyên)")) {
-            localStorage.removeItem('hd_history');
-            location.reload();
-        }
-    }
-</script>
-
+    // Khởi chạy ứng dụng
+    init();
+  </script>
 </body>
 </html>
