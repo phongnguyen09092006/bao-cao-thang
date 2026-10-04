@@ -127,12 +127,16 @@
   <!-- Header -->
   <div class="header card" style="text-align: center; background: transparent; box-shadow: none; padding-bottom: 0;">
     <h1 style="margin: 0; font-size: 24px; color: var(--blue);">📊 Báo Cáo Bán Hàng</h1>
-    <p style="margin: 4px 0 0; color: var(--text-muted); font-weight: 600;">NV: HÙNG DŨNG</p>
+    <p id="headerStaffDisplay" style="margin: 4px 0 0; color: var(--text-muted); font-weight: 600;">NV: HÙNG DŨNG</p>
   </div>
 
-  <!-- Card 1: Cài đặt chỉ tiêu tháng -->
+  <!-- Card 1: Cài đặt chỉ tiêu & Thông tin nhân viên -->
   <div class="card">
-    <h3>⚙️ Cài đặt chỉ tiêu tháng (KPI Settings)</h3>
+    <h3>⚙️ Cài đặt chỉ tiêu & Thông tin nhân viên</h3>
+    <div class="input-group">
+      <label>Tên nhân viên</label>
+      <input type="text" id="employeeName" placeholder="Nhập tên nhân viên (ví dụ: HÙNG DŨNG)" value="HÙNG DŨNG">
+    </div>
     <div class="flex-row">
       <div class="input-group flex-1">
         <label>Chỉ tiêu DS tháng (k)</label>
@@ -143,19 +147,15 @@
         <input type="number" id="kpiDayRevenue" value="4600">
       </div>
     </div>
-    <div class="flex-row">
-      <div class="input-group flex-1">
+    <div class="flex-row" style="margin-bottom: 0;">
+      <div class="input-group flex-1" style="margin-bottom: 0;">
         <label>Chỉ tiêu tổng đơn</label>
         <input type="number" id="kpiTotalOrders" value="175">
       </div>
-      <div class="input-group flex-1">
+      <div class="input-group flex-1" style="margin-bottom: 0;">
         <label>Số ngày công chuẩn</label>
         <input type="number" id="kpiStandardDays" value="25">
       </div>
-    </div>
-    <div class="input-group" style="margin-bottom: 0;">
-      <label>Google Apps Script API Endpoint (đồng bộ Drive)</label>
-      <input type="text" id="apiEndpoint" placeholder="https://script.google.com/macros/s/.../exec">
     </div>
   </div>
 
@@ -212,7 +212,7 @@
     </div>
 
     <button id="btnParseDate" class="btn btn-secondary" style="margin-bottom: 12px;">🔍 Lấy ngày từ text</button>
-    <button id="btnCalculate" class="btn btn-primary">⚡ Tính toán & Đồng bộ lên Drive</button>
+    <button id="btnCalculate" class="btn btn-primary">⚡ Tính toán báo cáo</button>
   </div>
 
   <!-- Card 4: Kết quả xuất báo cáo -->
@@ -254,20 +254,20 @@
     // 1. Cấu hình & Trạng thái lưu trữ (localStorage)
     // -------------------------------------------------------------
     const STATE_KEYS = {
+      employeeName: 'employeeName',
       kpiMonthRevenue: 'kpiMonthRevenue',
       kpiDayRevenue: 'kpiDayRevenue',
       kpiTotalOrders: 'kpiTotalOrders',
       kpiStandardDays: 'kpiStandardDays',
-      apiEndpoint: 'apiEndpoint',
       history: 'reportHistory'
     };
 
     const DEFAULT_KPI = {
+      employeeName: 'HÙNG DŨNG',
       kpiMonthRevenue: 120000,
       kpiDayRevenue: 4600,
       kpiTotalOrders: 175,
-      kpiStandardDays: 25,
-      apiEndpoint: ''
+      kpiStandardDays: 25
     };
 
     let historyData = JSON.parse(localStorage.getItem(STATE_KEYS.history)) || [];
@@ -299,11 +299,17 @@
       return { d: nextD, m: nextM, y: nextY, isFirstOfMonth: nextD === 1 };
     }
 
+    function updateStaffDisplay(name) {
+      const display = (name || '').trim();
+      const el = document.getElementById('headerStaffDisplay');
+      if (el) el.innerText = display ? `NV: ${display}` : 'NV: ...';
+    }
+
     // -------------------------------------------------------------
     // 3. Khởi tạo & Đồng bộ Form
     // -------------------------------------------------------------
     function init() {
-      // Tải và lắng nghe cài đặt KPI
+      // Tải và lắng nghe cài đặt KPI & tên nhân viên
       Object.keys(DEFAULT_KPI).forEach(key => {
         const val = localStorage.getItem(key) || DEFAULT_KPI[key];
         const el = document.getElementById(key);
@@ -311,9 +317,13 @@
           el.value = val;
           el.addEventListener('input', (e) => {
             localStorage.setItem(key, e.target.value);
+            if (key === 'employeeName') updateStaffDisplay(e.target.value);
           });
         }
       });
+
+      const currentStaff = document.getElementById('employeeName') ? document.getElementById('employeeName').value : 'HÙNG DŨNG';
+      updateStaffDisplay(currentStaff);
 
       // Mặc định ngày hôm nay
       const today = new Date();
@@ -558,9 +568,11 @@
       const dayProgress = Math.round((netRevenue / kpiDayRevenue) * 100);
       const orderProgress = Math.round((newOrders / kpiTotalOrders) * 100);
 
+      const staffName = (document.getElementById('employeeName').value || '').trim() || 'HÙNG DŨNG';
+
       // Tạo mẫu văn bản xuất ra gửi Zalo chuẩn theo SPEC mục 4
       let reportText = `Báo cáo bán hàng ngày:      ${dateStr}\n\n`;
-      reportText += `- NV: HÙNG DŨNG\n\n`;
+      reportText += `- NV: ${staffName}\n\n`;
       reportText += `- Tiến độ thời gian : ${workDay}/${kpiStandardDays}/${timeProgress}%\n\n`;
       reportText += `- DS  bán giấy : ${fmt(netRevenue)}/${fmt(newCumulative)}/${fmtMonthKPI(kpiMonthRevenue)}\n\n`;
       reportText += `- DS ngày : ${fmt(netRevenue)}/${kpiDayRevenue}/${dayProgress}%\n\n`;
@@ -578,6 +590,7 @@
       const record = {
         id: Date.now(),
         date: dateStr,
+        employeeName: staffName,
         workDay: workDay,
         orders: validOrderCount,
         revenue: Math.round(netRevenue),
@@ -607,9 +620,6 @@
 
       // Tự động sao chép vào bộ nhớ tạm
       copyToClipboard(reportText);
-
-      // Đồng bộ lên Google Drive / Google Apps Script
-      syncToGoogleDrive(record);
     });
 
     // -------------------------------------------------------------
@@ -650,40 +660,6 @@
       }
     }
 
-    function syncToGoogleDrive(record) {
-      const endpoint = document.getElementById('apiEndpoint').value.trim();
-      if (!endpoint) {
-        showSyncNotice("Đã lưu báo cáo cục bộ (Chưa cấu hình Endpoint Google Sheets)", "var(--text-muted)");
-        return;
-      }
-
-      showSyncNotice("🔄 Đang đồng bộ lên Google Sheets...", "var(--blue)");
-      
-      // Gửi POST payload theo SPEC mục 5
-      const payload = {
-        date: record.date,
-        workDay: record.workDay,
-        orders: record.orders,
-        revenue: record.revenue,
-        deduction: record.deduction,
-        cumulative: record.cumulative,
-        cumulativeOrders: record.cumulativeOrders,
-        rawText: record.rawText,
-        count3: record.count3,
-        count5: record.count5
-      };
-
-      fetch(endpoint, {
-        method: 'POST',
-        mode: 'no-cors', // Tránh lỗi CORS preflight với Google Apps Script Web App
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      }).then(() => {
-        showSyncNotice("✅ Đồng bộ lên Google Sheets thành công!", "var(--green)");
-      }).catch(err => {
-        showSyncNotice("❌ Lỗi khi đồng bộ lên Google Sheets: " + err.message, "var(--red)");
-      });
-    }
 
     // -------------------------------------------------------------
     // 8. Danh sách Lịch sử & Modal chi tiết
