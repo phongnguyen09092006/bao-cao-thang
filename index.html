@@ -424,7 +424,7 @@
             <label class="font-label-md text-label-md text-on-surface font-medium" for="kpiMonthRevenue">Chỉ tiêu DS tháng (k)</label>
             <input id="kpiMonthRevenue" type="number" value="120000"
               class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:outline-none transition-all">
-            <span class="font-body-sm text-[11px] text-outline">=120,000,000 đ</span>
+            <span id="kpi-month-dong-note" class="font-body-sm text-[11px] text-outline">=120,000,000 đ</span>
           </div>
           <!-- Ngày công chuẩn -->
           <div class="flex flex-col gap-1.5">
@@ -1158,6 +1158,13 @@
       const pace = Math.round(m / (d || 1));
       const note = document.getElementById('daily-auto-note');
       if (note) note.textContent = `≈ ${pace.toLocaleString('vi-VN')}k (tự tính)`;
+
+      const dongNote = document.getElementById('kpi-month-dong-note');
+      if (dongNote) {
+        const dong = Math.round(m * 1000);
+        const dongStr = dong.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        dongNote.textContent = `=${dongStr} đ`;
+      }
     }
 
     document.getElementById('kpiMonthRevenue').addEventListener('input', updateAutoNote);
