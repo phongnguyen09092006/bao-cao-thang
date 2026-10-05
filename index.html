@@ -6,286 +6,578 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Báo Cáo BH">
-  <meta name="theme-color" content="#007aff">
+  <meta name="theme-color" content="#004ac6">
   <link rel="manifest" href="./manifest.json">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%23007aff'/><text x='96' y='125' font-size='90' text-anchor='middle' fill='white'>📊</text></svg>">
   <title>Báo Cáo Bán Hàng - HÙNG DŨNG</title>
+
+  <!-- Fonts: Nunito (rounded, matches screenshot) + Material Symbols -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#004ac6",
+            "on-primary": "#ffffff",
+            "primary-container": "#2563eb",
+            "on-primary-container": "#eeefff",
+            "primary-fixed": "#dbe1ff",
+            "primary-fixed-dim": "#b4c5ff",
+            "on-primary-fixed": "#00174b",
+            "on-primary-fixed-variant": "#003ea8",
+            "secondary": "#006c49",
+            "on-secondary": "#ffffff",
+            "secondary-container": "#6cf8bb",
+            "on-secondary-container": "#00714d",
+            "secondary-fixed": "#6ffbbe",
+            "secondary-fixed-dim": "#4edea3",
+            "on-secondary-fixed": "#002113",
+            "on-secondary-fixed-variant": "#005236",
+            "tertiary": "#784b00",
+            "on-tertiary": "#ffffff",
+            "tertiary-container": "#996100",
+            "on-tertiary-container": "#ffeedd",
+            "tertiary-fixed": "#ffddb8",
+            "tertiary-fixed-dim": "#ffb95f",
+            "on-tertiary-fixed": "#2a1700",
+            "on-tertiary-fixed-variant": "#653e00",
+            "error": "#ba1a1a",
+            "on-error": "#ffffff",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a",
+            "surface": "#faf8ff",
+            "surface-dim": "#d2d9f4",
+            "surface-bright": "#faf8ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f2f3ff",
+            "surface-container": "#eaedff",
+            "surface-container-high": "#e2e7ff",
+            "surface-container-highest": "#dae2fd",
+            "on-surface": "#131b2e",
+            "on-surface-variant": "#434655",
+            "outline": "#737686",
+            "outline-variant": "#c3c6d7",
+            "inverse-surface": "#283044",
+            "inverse-on-surface": "#eef0ff",
+            "inverse-primary": "#b4c5ff",
+            "surface-tint": "#0053db",
+            "background": "#faf8ff",
+            "on-background": "#131b2e",
+            "surface-variant": "#dae2fd"
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "0.75rem",
+            "xl": "1rem",
+            "2xl": "1.25rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "gutter": "1rem",
+            "margin": "1rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-md": "0.75rem",
+            "space-lg": "1rem",
+            "space-xl": "1.5rem"
+          },
+          fontFamily: {
+            "sans": ["Nunito", "-apple-system", "BlinkMacSystemFont", "Helvetica Neue", "Arial", "sans-serif"],
+            "mono": ["ui-monospace", "SFMono-Regular", "SF Mono", "Menlo", "Monaco", "Consolas", "monospace"],
+            "label-sm": ["Nunito"],
+            "label-md": ["Nunito"],
+            "label-lg": ["Nunito"],
+            "body-sm": ["Nunito"],
+            "body-md": ["Nunito"],
+            "body-lg": ["Nunito"],
+            "headline-sm": ["Nunito"],
+            "headline-md": ["Nunito"],
+            "headline-lg": ["Nunito"],
+            "display-lg": ["Nunito"],
+            "code-output": ["ui-monospace", "SFMono-Regular", "SF Mono", "Menlo", "Monaco", "Consolas", "monospace"]
+          },
+          fontSize: {
+            "label-sm": ["11px", { lineHeight: "14px", fontWeight: "500" }],
+            "label-md": ["12px", { lineHeight: "16px", fontWeight: "600" }],
+            "label-lg": ["14px", { lineHeight: "18px", fontWeight: "600" }],
+            "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }],
+            "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "headline-sm": ["18px", { lineHeight: "24px", fontWeight: "600" }],
+            "headline-md": ["20px", { lineHeight: "26px", fontWeight: "600" }],
+            "headline-lg": ["24px", { lineHeight: "30px", fontWeight: "700" }],
+            "display-lg": ["32px", { lineHeight: "38px", fontWeight: "700" }],
+            "code-output": ["13px", { lineHeight: "20px", fontWeight: "400" }]
+          }
+        }
+      }
+    };
+  </script>
+
   <style>
-    :root {
-      --text: #1d1d1f;
-      --text-muted: #86868b;
-      --blue: #007aff;
-      --green: #34c759;
-      --red: #ff3b30;
-      --orange: #ff9500;
-      --excel: #107c41;
-      --radius: 24px;
+    @layer base {
+      html, body { width: 100vw; margin: 0; padding: 0; }
+      body { overscroll-behavior: none; font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; }
+      .pb-safe { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+      ::-webkit-scrollbar { display: none; }
     }
-    * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      /* Futuristic iOS Mesh Gradient */
-      background: 
-        radial-gradient(circle at 10% 10%, #e0e8ff 0%, transparent 40%),
-        radial-gradient(circle at 90% 20%, #f4d9ff 0%, transparent 40%),
-        radial-gradient(circle at 50% 80%, #dcf0ff 0%, transparent 50%),
-        radial-gradient(circle at 80% 90%, #ffe6eb 0%, transparent 40%);
-      background-color: #f5f5f9;
-      background-attachment: fixed;
-      color: var(--text);
-      margin: 0;
-      padding: 16px;
-      padding-top: max(24px, env(safe-area-inset-top));
-      padding-bottom: max(40px, env(safe-area-inset-bottom));
-      -webkit-font-smoothing: antialiased;
-      letter-spacing: -0.01em;
-    }
-    .card {
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
-    }
-    h1, h2, h3 { margin-top: 0; font-weight: 700; letter-spacing: -0.02em; }
-    h3 { 
-      font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; color: var(--text);
-    }
-    .input-group { margin-bottom: 16px; }
-    .input-group label {
-      display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-muted);
-    }
-    input, textarea {
-      width: 100%; padding: 14px 16px;
-      border: 1px solid rgba(0, 0, 0, 0.03);
-      border-radius: 16px; font-size: 16px;
-      font-family: inherit; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      background: rgba(255, 255, 255, 0.7); color: var(--text);
-      -webkit-appearance: none;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
-    }
-    input:focus, textarea:focus {
-      outline: none; background: #fff; border-color: rgba(0, 122, 255, 0.3);
-      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15), inset 0 2px 4px rgba(0,0,0,0.01);
-      transform: scale(1.01);
-    }
-    .btn {
-      display: inline-flex; justify-content: center; align-items: center; gap: 8px;
-      width: 100%; padding: 16px; font-size: 16px; font-weight: 600;
-      border: none; border-radius: 16px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .btn:active { transform: scale(0.95); opacity: 0.9; }
-    .btn-primary { 
-      background: linear-gradient(135deg, #007aff, #0056b3); 
-      color: #fff; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); 
-    }
-    .btn-success { 
-      background: linear-gradient(135deg, #34c759, #248a3d); 
-      color: #fff; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3); 
-    }
-    .btn-danger { 
-      background: linear-gradient(135deg, #ff3b30, #b32922); 
-      color: #fff; box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3); 
-    }
-    .btn-secondary { 
-      background: rgba(255, 255, 255, 0.5); color: var(--text); 
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    }
-    .btn-secondary:active { background: rgba(0,0,0,0.05); }
-    
-    .flex-row { display: flex; gap: 12px; }
-    .flex-1 { flex: 1; }
-    
-    .widget-container { display: flex; gap: 12px; }
-    .widget {
-      flex: 1; text-align: center; padding: 20px 12px;
-      border-radius: 18px; background: rgba(255, 255, 255, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-    }
-    .widget-title { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .widget-value { font-size: 32px; font-weight: 700; color: var(--blue); }
-    
-    .history-item {
-      padding: 16px; border-bottom: 1px solid rgba(0,0,0,0.04);
-      cursor: pointer; transition: all 0.2s; border-radius: 12px;
-    }
-    .history-item:hover { background: rgba(255,255,255,0.8); transform: scale(1.01); }
-    .history-item:last-child { border-bottom: none; }
-    .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-    .history-date { font-weight: 600; font-size: 16px; color: var(--text); }
-    .history-revenue { font-weight: 700; font-size: 16px; color: var(--green); }
-    .history-summary { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
-    
-    /* Modal */
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.25); z-index: 100;
-      padding: 20px; align-items: center; justify-content: center;
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    }
-    .modal-content {
-      background: rgba(255, 255, 255, 0.85); border-radius: 28px;
-      border: 1px solid rgba(255,255,255,0.6);
-      width: 100%; max-width: 440px; padding: 32px 24px;
-      max-height: 90vh; overflow-y: auto; position: relative;
-      box-shadow: 0 24px 48px rgba(0,0,0,0.15);
-    }
-    .modal.active { display: flex; animation: zoomIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    @keyframes zoomIn { 
-      from { opacity: 0; transform: scale(0.9) translateY(20px); } 
-      to { opacity: 1; transform: scale(1) translateY(0); } 
-    }
-    .modal-close {
-      position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.05); border: none;
-      width: 32px; height: 32px; border-radius: 16px;
-      font-size: 20px; line-height: 32px; text-align: center; color: var(--text-muted); cursor: pointer;
-      transition: background 0.2s;
-    }
-    .modal-close:hover { background: rgba(0,0,0,0.1); }
-    
-    pre {
-      background: rgba(0,0,0,0.03); padding: 16px; border-radius: 12px;
-      white-space: pre-wrap; word-wrap: break-word; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 14px; line-height: 1.5; margin: 12px 0; border: 1px solid rgba(0,0,0,0.02); color: var(--text);
-    }
+    .view-section { display: none; }
+    .view-section.active { display: flex; flex-direction: column; }
+    .tab-active { color: #004ac6 !important; font-weight: 700; }
+    .tab-active span.material-symbols-outlined { font-variation-settings: 'FILL' 1; }
+    /* Bottom sheet modal animation */
+    .sheet-open { transform: translateY(0) !important; }
+    .modal-bg-open { opacity: 1 !important; pointer-events: auto !important; }
   </style>
 </head>
-<body>
 
-  <!-- Header -->
-  <div class="header" style="text-align: center; padding: 10px 0 20px;">
-    <h1 style="margin: 0; font-size: 24px; color: var(--text); letter-spacing: -0.5px;">Báo Cáo Bán Hàng</h1>
-    <p id="headerStaffDisplay" style="margin: 6px 0 0; color: var(--text-muted); font-size: 14px; font-weight: 500;">NV: HÙNG DŨNG</p>
+<body class="bg-surface text-on-surface flex flex-col min-h-screen">
+
+  <!-- ═══════════════════════════════════════════════ HEADER ═══ -->
+  <header class="fixed top-0 w-full z-50 pt-safe bg-surface/90 backdrop-blur-xl shadow-[0_1px_6px_rgba(0,0,0,0.05)]">
+    <div class="h-16 px-gutter flex items-center justify-between">
+      <div class="flex flex-col">
+        <span class="font-label-sm text-label-sm text-outline tracking-widest uppercase">BÁO CÁO BÁN HÀNG</span>
+        <div class="flex items-center gap-space-xs">
+          <h1 class="font-headline-sm text-headline-sm text-on-surface font-bold" id="header-title">Lập Báo Cáo</h1>
+        </div>
+      </div>
+      <div class="flex items-center gap-space-xs">
+        <div class="flex items-center gap-1.5 px-space-md py-1 rounded-full bg-surface-container-high border border-outline-variant/30 text-primary font-label-md">
+          <span class="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
+          <span class="font-semibold text-primary" id="header-month-badge">T10/2024</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════ MAIN ═══════ -->
+  <main class="flex-1 w-full pt-16 pb-24 bg-surface max-w-[430px] mx-auto px-margin min-h-screen">
+
+    <!-- ──────── TAB 1: LẬP BÁO CÁO ──────── -->
+    <section id="view-lap-bao-cao" class="view-section active flex-col gap-space-lg pt-space-lg pb-space-xl">
+
+      <!-- Card: Thông tin nhân viên + KPI tóm tắt -->
+      <div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-md">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-space-sm min-w-0">
+            <div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-primary text-[20px]">person</span>
+            </div>
+            <div class="flex items-center gap-space-xs min-w-0">
+              <input id="employeeName" type="text" value="HÙNG DŨNG"
+                class="font-headline-sm text-headline-sm text-on-surface bg-transparent focus:outline-none focus:bg-surface-container-low rounded px-1 transition-colors truncate w-full max-w-[140px]">
+              <button onclick="document.getElementById('employeeName').focus()" type="button" class="text-outline hover:text-primary transition-colors shrink-0">
+                <span class="material-symbols-outlined text-[15px]">edit</span>
+              </button>
+            </div>
+          </div>
+          <!-- Mini KPI -->
+          <div class="flex flex-col items-end">
+            <span class="font-label-sm text-label-sm text-outline">DS tháng đạt</span>
+            <span class="font-label-lg text-label-lg text-primary font-bold" id="mini-month-progress">0%</span>
+          </div>
+        </div>
+        <!-- Progress bar -->
+        <div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+          <div id="mini-progress-bar" class="h-full rounded-full transition-all duration-500" style="width:0%; background: linear-gradient(90deg, #004ac6 0%, #2563eb 60%, #4edea3 100%);"></div>
+        </div>
+        <div class="flex justify-between text-label-sm text-outline">
+          <span id="mini-cumulative-label">Lũy kế: 0k</span>
+          <span id="mini-kpi-label">Mục tiêu: 120,000k</span>
+        </div>
+      </div>
+
+      <!-- Card: Trưng bày tháng -->
+      <div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-md">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-space-xs">
+            <div class="w-7 h-7 rounded-lg bg-tertiary-fixed flex items-center justify-center">
+              <span class="material-symbols-outlined text-tertiary text-[18px]">workspace_premium</span>
+            </div>
+            <span class="font-headline-sm text-headline-sm text-on-surface">Trưng Bày Tháng</span>
+          </div>
+          <span class="font-label-sm text-label-sm text-outline bg-surface-container px-2 py-0.5 rounded-full" id="display-month-badge">Tháng hiện tại</span>
+        </div>
+        <div class="grid grid-cols-2 gap-space-md">
+          <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col items-center">
+            <span class="font-label-md text-label-md text-on-surface-variant mb-1">Gói TB 3%</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-[28px] font-bold font-mono text-on-surface leading-none" id="display3Count">0</span>
+              <span class="font-label-md text-label-md text-outline">đơn</span>
+            </div>
+          </div>
+          <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col items-center">
+            <span class="font-label-md text-label-md text-on-surface-variant mb-1">Gói TB 5%</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-[28px] font-bold font-mono text-on-surface leading-none" id="display5Count">0</span>
+              <span class="font-label-md text-label-md text-outline">đơn</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Form nhập báo cáo hàng ngày -->
+      <div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-md">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-space-xs">
+            <div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-[18px]">edit_calendar</span>
+            </div>
+            <span class="font-headline-sm text-headline-sm text-on-surface">Nhập Báo Cáo</span>
+          </div>
+          <span class="font-label-sm text-label-sm bg-secondary-container text-on-secondary-container px-2.5 py-1 rounded-full font-medium">Hôm nay</span>
+        </div>
+
+        <!-- Ngày + Ngày công -->
+        <div class="grid grid-cols-2 gap-space-sm">
+          <div class="flex flex-col gap-1">
+            <label class="font-label-sm text-label-sm text-outline" for="reportDate">Ngày báo cáo</label>
+            <div class="h-11 bg-surface-container-low rounded-lg px-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-outline text-[18px]">calendar_today</span>
+              <input id="reportDate" type="date" class="w-full bg-transparent font-label-md text-label-md text-on-surface focus:outline-none">
+            </div>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="font-label-sm text-label-sm text-outline" for="workDay">Ngày công thứ</label>
+            <div class="h-11 bg-surface-container-low rounded-lg px-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-outline text-[18px]">event_repeat</span>
+              <input id="workDay" type="number" value="1" min="1"
+                class="w-full bg-transparent font-label-md text-label-md text-on-surface focus:outline-none font-semibold">
+              <button id="btnNextDay" class="text-primary font-label-sm text-label-sm shrink-0 hover:text-primary-container transition-colors" title="Sang ngày tiếp theo">
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DS cũ + Đơn cũ + Trừ -->
+        <div class="flex flex-col gap-space-sm">
+          <div class="flex flex-col gap-1">
+            <label class="font-label-sm text-label-sm text-outline" for="cumulative">Doanh số lũy kế trước hôm nay (k)</label>
+            <div class="h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between">
+              <input id="cumulative" type="number" value="0" placeholder="0"
+                class="w-full bg-transparent font-headline-sm text-headline-sm text-primary font-mono focus:outline-none">
+              <span class="font-label-md text-label-md text-outline ml-2 shrink-0">k</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-space-sm">
+            <div class="flex flex-col gap-1">
+              <label class="font-label-sm text-label-sm text-outline" for="cumulativeOrders">Số đơn cũ</label>
+              <div class="h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between">
+                <input id="cumulativeOrders" type="number" value="0"
+                  class="w-full bg-transparent font-headline-sm text-headline-sm text-on-surface font-mono focus:outline-none">
+                <span class="font-label-sm text-label-sm text-outline">Đơn</span>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="font-label-sm text-label-sm text-error" for="deduction">Tiền rớt/hủy đơn (k)</label>
+              <div class="h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between">
+                <input id="deduction" type="number" value="0"
+                  class="w-full bg-transparent font-headline-sm text-headline-sm text-error font-mono focus:outline-none">
+                <span class="font-label-sm text-label-sm text-error shrink-0">k</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Textarea nội dung đơn hàng -->
+        <div class="flex flex-col gap-1">
+          <div class="flex justify-between items-center">
+            <label class="font-label-sm text-label-sm text-outline" for="rawText">Nội dung đơn hàng hôm nay (từ Zalo)</label>
+            <button id="btnParseDate" class="font-label-sm text-label-sm text-primary hover:underline transition-colors">Lấy ngày từ text</button>
+          </div>
+          <textarea id="rawText" rows="5" placeholder="Dán tin nhắn đơn hàng vào đây...&#10;Ví dụ: đơn 1: 5 thùng x 1200..."
+            class="w-full bg-surface-container-low rounded-lg p-3 font-body-sm text-body-sm text-on-surface font-mono focus:outline-none focus:bg-surface-container-lowest resize-none leading-relaxed transition-all placeholder:text-outline-variant"></textarea>
+          <div id="dateNotice" class="font-label-sm text-label-sm text-secondary font-medium px-1"></div>
+        </div>
+
+        <!-- Nút tính toán -->
+        <button id="btnCalculate"
+          class="w-full h-12 rounded-xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-space-sm shadow-md active:scale-[0.985] transition-all">
+          <span class="material-symbols-outlined text-[20px]">calculate</span>
+          <span>BẮT ĐẦU TÍNH TOÁN BÁO CÁO</span>
+        </button>
+      </div>
+
+      <!-- Card: Kết quả báo cáo (ẩn ban đầu) -->
+      <div id="reportResultCard" class="hidden bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-md">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-space-xs">
+            <div class="w-7 h-7 rounded-lg bg-secondary-container flex items-center justify-center">
+              <span class="material-symbols-outlined text-on-secondary-container text-[18px]">send</span>
+            </div>
+            <div>
+              <span class="font-headline-sm text-headline-sm text-on-surface">Báo Cáo Hoàn Chỉnh</span>
+              <p class="font-label-sm text-label-sm text-outline">Bản chuẩn gửi Zalo / Telegram</p>
+            </div>
+          </div>
+          <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+        </div>
+
+        <!-- Output box: monospace, copy-ready -->
+        <div class="relative bg-surface-container-low rounded-xl border border-outline-variant/30 overflow-hidden">
+          <button id="btnCopy"
+            class="absolute top-2 right-2 z-10 flex items-center gap-1 px-2.5 py-1 bg-surface-container-lowest rounded-lg font-label-sm text-label-sm text-primary shadow-sm hover:bg-surface-container transition-colors active:scale-95">
+            <span class="material-symbols-outlined text-[15px]" id="copy-icon">content_copy</span>
+            <span id="copy-text">Sao chép</span>
+          </button>
+          <pre id="reportOutput"
+            class="font-mono text-code-output text-on-surface whitespace-pre-wrap p-space-md pt-10 select-all leading-relaxed"></pre>
+        </div>
+
+        <div id="syncStatus" class="font-label-sm text-label-sm text-secondary text-center font-medium"></div>
+      </div>
+
+    </section>
+
+    <!-- ──────── TAB 2: LỊCH SỬ & XUẤT CSV ──────── -->
+    <section id="view-lich-su" class="view-section flex-col gap-space-md pt-space-lg pb-space-xl">
+
+      <!-- Tổng quan tháng -->
+      <div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm border border-outline-variant/20 flex flex-col gap-space-sm">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-space-xs">
+            <span class="material-symbols-outlined text-primary text-[20px]">calendar_month</span>
+            <span class="font-headline-sm text-headline-sm text-on-surface" id="history-month-title">Tháng hiện tại</span>
+          </div>
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-bold">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+            <span id="history-record-count">0 Báo Cáo</span>
+          </span>
+        </div>
+        <div class="p-space-sm rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+          <div class="flex justify-between items-center">
+            <span class="font-label-md text-label-md text-on-surface-variant">Tổng lũy kế tháng</span>
+            <span class="font-label-lg text-label-lg text-primary font-bold" id="history-total-rev">0k</span>
+          </div>
+          <div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+            <div id="history-progress-bar" class="h-full rounded-full bg-primary transition-all" style="width:0%"></div>
+          </div>
+          <div class="flex justify-between font-label-sm text-label-sm text-outline">
+            <span id="history-days-worked">0 ngày báo cáo</span>
+            <span id="history-progress-pct">0%</span>
+          </div>
+        </div>
+        <div class="flex flex-col gap-space-sm pt-space-xs">
+          <button id="btnExportCSV"
+            class="w-full h-14 rounded-lg bg-secondary text-on-secondary px-space-md flex items-center justify-between shadow-md active:scale-[0.99] transition-all">
+            <div class="flex items-center gap-space-sm">
+              <div class="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-[22px]">table_chart</span>
+              </div>
+              <div class="flex flex-col text-left">
+                <span class="font-label-lg text-label-lg font-bold">XUẤT FILE CSV (EXCEL)</span>
+                <span class="font-label-sm text-label-sm text-secondary-container">Tải về .csv để mở trên Excel / Sheets</span>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-[18px]">download</span>
+          </button>
+          <button id="btnClearHistory"
+            class="w-full h-11 rounded-lg bg-error-container text-on-error-container px-space-md flex items-center justify-center gap-space-xs active:bg-error-container/80 transition-colors">
+            <span class="material-symbols-outlined text-[20px]">delete_outline</span>
+            <span class="font-label-md text-label-md font-bold uppercase tracking-wider">Xóa lịch sử báo cáo</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Danh sách lịch sử -->
+      <div class="flex flex-col gap-space-sm">
+        <div class="flex items-center justify-between px-space-xs">
+          <h2 class="font-headline-sm text-headline-sm text-on-surface">Chi Tiết Từng Ngày</h2>
+          <span class="font-label-sm text-label-sm text-primary font-semibold">Nhấn để xem chi tiết</span>
+        </div>
+        <div id="historyList" class="flex flex-col gap-space-sm"></div>
+      </div>
+
+    </section>
+
+    <!-- ──────── TAB 3: CÀI ĐẶT CHỈ TIÊU ──────── -->
+    <section id="view-chi-tieu" class="view-section flex-col gap-space-lg pt-space-lg pb-space-xl">
+
+      <!-- Employee bar -->
+      <div class="flex items-center gap-space-sm px-space-md py-space-sm rounded-xl bg-surface-container-lowest shadow-sm border border-outline-variant/20">
+        <span class="material-symbols-outlined text-primary text-[20px]">person</span>
+        <span id="settings-emp-display" class="font-headline-sm text-[16px] text-on-surface font-semibold">HÙNG DŨNG</span>
+      </div>
+
+      <!-- Core KPI settings -->
+      <section class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-lg">
+        <div class="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
+          <div class="flex items-center gap-space-xs">
+            <span class="material-symbols-outlined text-primary text-[22px]">tune</span>
+            <h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Thiết Lập Chỉ Tiêu</h2>
+          </div>
+          <span class="font-label-sm text-label-sm text-outline bg-surface-container px-2 py-0.5 rounded-full">KPI Tháng</span>
+        </div>
+        <div class="grid grid-cols-2 gap-space-md">
+          <!-- Chỉ tiêu DS tháng -->
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label-md text-label-md text-on-surface font-medium" for="kpiMonthRevenue">Chỉ tiêu DS tháng (k)</label>
+            <input id="kpiMonthRevenue" type="number" value="120000"
+              class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:outline-none transition-all">
+            <span class="font-body-sm text-[11px] text-outline">=120,000,000 đ</span>
+          </div>
+          <!-- Ngày công chuẩn -->
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label-md text-label-md text-on-surface font-medium" for="kpiStandardDays">Ngày công chuẩn</label>
+            <input id="kpiStandardDays" type="number" value="25" min="1" max="31"
+              class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:outline-none transition-all">
+            <span class="font-body-sm text-[11px] text-outline">Ngày làm việc</span>
+          </div>
+          <!-- Chỉ tiêu DS ngày -->
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label-md text-label-md text-on-surface font-medium" for="kpiDayRevenue">Chỉ tiêu DS ngày (k)</label>
+            <input id="kpiDayRevenue" type="number" value="4600"
+              class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:outline-none transition-all">
+            <span id="daily-auto-note" class="font-body-sm text-[11px] text-secondary font-medium">≈ 4,800k (tự tính)</span>
+          </div>
+          <!-- Chỉ tiêu tổng đơn -->
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label-md text-label-md text-on-surface font-medium" for="kpiTotalOrders">Chỉ tiêu tổng đơn</label>
+            <input id="kpiTotalOrders" type="number" value="175"
+              class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:outline-none transition-all">
+            <span class="font-body-sm text-[11px] text-outline">Đơn hàng / tháng</span>
+          </div>
+        </div>
+
+        <!-- Auto calc info -->
+        <div class="p-space-md rounded-xl bg-surface-container-low border border-outline-variant/20 flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-primary">info</span>
+              Đơn vị: ngàn đồng (k)
+            </span>
+            <button id="btnAutoCalc" type="button"
+              class="flex items-center gap-1.5 px-space-md py-1 rounded-full bg-primary text-on-primary hover:bg-primary-container active:scale-[0.985] shadow-sm transition-all text-[11px] font-label-sm font-semibold">
+              <span class="material-symbols-outlined text-[14px]">calculate</span>
+              <span>Tự tính DS ngày</span>
+            </button>
+          </div>
+          <p class="font-body-sm text-[12px] text-outline leading-relaxed">
+            DS ngày = DS tháng ÷ Ngày công chuẩn
+          </p>
+        </div>
+
+        <button id="btnSaveKPI" type="button"
+          class="w-full h-12 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-space-xs shadow-md active:scale-[0.985] transition-all">
+          <span class="material-symbols-outlined text-[20px]">check_circle</span>
+          <span>Lưu Cài Đặt Chỉ Tiêu</span>
+        </button>
+      </section>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════════ BOTTOM NAV ═══ -->
+  <nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)]">
+    <div class="max-w-[430px] mx-auto flex items-center justify-around h-16 px-space-sm">
+      <a id="nav-lap" data-view="view-lap-bao-cao" data-title="Lập Báo Cáo" href="#"
+        class="nav-tab flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs text-primary tab-active transition-all">
+        <span class="material-symbols-outlined text-[24px]">edit_note</span>
+        <span class="font-label-sm text-label-sm">Lập Báo Cáo</span>
+      </a>
+      <a id="nav-lich-su" data-view="view-lich-su" data-title="Lịch Sử & Xuất" href="#"
+        class="nav-tab flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs text-on-surface-variant hover:text-on-surface transition-all">
+        <span class="material-symbols-outlined text-[24px]">bar_chart</span>
+        <span class="font-label-sm text-label-sm">Lịch Sử</span>
+      </a>
+      <a id="nav-chi-tieu" data-view="view-chi-tieu" data-title="Cài Đặt Chỉ Tiêu" href="#"
+        class="nav-tab flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs text-on-surface-variant hover:text-on-surface transition-all">
+        <span class="material-symbols-outlined text-[24px]">tune</span>
+        <span class="font-label-sm text-label-sm">Chỉ Tiêu</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════ MODAL: Chi tiết lịch sử ═════════════ -->
+  <div id="detailModal"
+    class="fixed inset-0 z-50 bg-on-surface/40 backdrop-blur-sm flex items-end justify-center transition-opacity duration-200 opacity-0 pointer-events-none">
+    <div id="detailModalSheet"
+      class="bg-surface-container-lowest rounded-t-2xl p-space-lg w-full max-w-[430px] shadow-2xl flex flex-col gap-space-md max-h-[85vh] overflow-y-auto transform transition-transform duration-300 translate-y-full">
+      <!-- Handle -->
+      <div class="w-12 h-1.5 bg-surface-container-highest rounded-full mx-auto self-center -mt-1"></div>
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="font-label-sm text-label-sm text-primary uppercase font-bold" id="modalDayTag">Ngày công</span>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface" id="modalDate">Chi tiết báo cáo</h3>
+        </div>
+        <button id="btnCloseModal" class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <!-- KPI grid -->
+      <div class="grid grid-cols-2 gap-space-sm">
+        <div class="p-space-sm bg-surface-container-low rounded-lg">
+          <span class="font-label-md text-label-md text-on-surface-variant">Doanh số ngày</span>
+          <p class="font-headline-md text-headline-md text-primary mt-space-xs font-mono" id="modalRevenue">0k</p>
+        </div>
+        <div class="p-space-sm bg-surface-container-low rounded-lg">
+          <span class="font-label-md text-label-md text-on-surface-variant">Lũy tiến tháng</span>
+          <p class="font-headline-md text-headline-md text-on-surface mt-space-xs font-mono" id="modalCumulative">0k</p>
+        </div>
+      </div>
+      <!-- Meta -->
+      <div class="p-space-md bg-surface-container-lowest rounded-lg shadow-sm flex flex-col gap-space-sm">
+        <div class="flex justify-between items-center">
+          <span class="font-body-sm text-body-sm text-on-surface-variant">Số đơn hôm nay</span>
+          <span class="font-label-lg text-label-lg text-on-surface font-semibold" id="modalOrders">0 đơn</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="font-body-sm text-body-sm text-on-surface-variant">Giảm trừ / Rớt đơn</span>
+          <span class="font-label-lg text-label-lg text-error font-semibold" id="modalDeduction">0k</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="font-body-sm text-body-sm text-on-surface-variant">Trưng bày 3% / 5%</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant" id="modalDisplay">0 / 0</span>
+        </div>
+      </div>
+      <!-- Report text -->
+      <div class="flex flex-col gap-space-xs">
+        <span class="font-label-md text-label-md text-on-surface-variant">Văn bản báo cáo</span>
+        <pre id="modalReportText" class="font-mono text-code-output text-on-surface bg-surface-container-low p-space-sm rounded-lg whitespace-pre-wrap leading-relaxed select-all"></pre>
+      </div>
+      <!-- Raw text -->
+      <div class="flex flex-col gap-space-xs">
+        <span class="font-label-md text-label-md text-on-surface-variant">Đơn hàng gốc</span>
+        <pre id="modalRawText" class="font-mono text-[11px] text-on-surface bg-surface-container-low p-space-sm rounded-lg whitespace-pre-wrap max-h-[100px] overflow-y-auto"></pre>
+      </div>
+      <!-- Actions -->
+      <div class="flex items-center gap-space-sm pt-space-xs">
+        <button id="btnModalCopyReport"
+          class="flex-1 h-12 rounded-lg bg-surface-container text-primary font-label-lg text-label-lg active:scale-95 transition-transform flex items-center justify-center gap-space-xs">
+          <span class="material-symbols-outlined text-[20px]">content_copy</span>
+          Sao chép báo cáo
+        </button>
+        <button id="btnModalCopyRaw"
+          class="flex-1 h-12 rounded-lg bg-primary text-on-primary font-label-lg text-label-lg shadow-md active:scale-95 transition-transform flex items-center justify-center gap-space-xs">
+          <span class="material-symbols-outlined text-[20px]">article</span>
+          Sao chép đơn gốc
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- Card 1: Cài đặt chỉ tiêu & Thông tin nhân viên -->
-  <div class="card">
-    <h3>Cài đặt chỉ tiêu</h3>
-    <div class="input-group">
-      <label>Tên nhân viên</label>
-      <input type="text" id="employeeName" placeholder="Nhập tên nhân viên (ví dụ: HÙNG DŨNG)" value="HÙNG DŨNG">
-    </div>
-    <div class="flex-row">
-      <div class="input-group flex-1">
-        <label>Chỉ tiêu DS tháng (k)</label>
-        <input type="number" id="kpiMonthRevenue" value="120000">
-      </div>
-      <div class="input-group flex-1">
-        <label>Chỉ tiêu DS ngày (k)</label>
-        <input type="number" id="kpiDayRevenue" value="4600">
-      </div>
-    </div>
-    <div class="flex-row" style="margin-bottom: 0;">
-      <div class="input-group flex-1" style="margin-bottom: 0;">
-        <label>Chỉ tiêu tổng đơn</label>
-        <input type="number" id="kpiTotalOrders" value="175">
-      </div>
-      <div class="input-group flex-1" style="margin-bottom: 0;">
-        <label>Ngày công chuẩn</label>
-        <input type="number" id="kpiStandardDays" value="25">
-      </div>
-    </div>
+  <!-- ═══════════════════════ TOAST NOTIFICATION ═════════════════ -->
+  <div id="toast"
+    class="fixed top-20 left-1/2 -translate-x-1/2 z-[60] bg-inverse-surface text-inverse-on-surface px-space-lg py-space-sm rounded-full shadow-xl flex items-center gap-space-xs transition-all duration-300 opacity-0 pointer-events-none scale-90">
+    <span class="material-symbols-outlined text-secondary-container text-[18px]">check_circle</span>
+    <span class="font-label-md text-label-md" id="toast-text">Đã sao chép!</span>
   </div>
 
-  <!-- Card 2: Thống kê Trưng bày theo tháng -->
-  <div class="card">
-    <h3>Thống kê trưng bày</h3>
-    <div class="widget-container">
-      <div class="widget">
-        <div class="widget-title">Trưng bày 3%</div>
-        <div class="widget-value" id="display3Count">0</div>
-      </div>
-      <div class="widget">
-        <div class="widget-title">Trưng bày 5%</div>
-        <div class="widget-value" id="display5Count">0</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Card 3: Form nhập dữ liệu báo cáo hàng ngày -->
-  <div class="card">
-    <h3>Nhập báo cáo hàng ngày</h3>
-    <div class="input-group">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <label style="margin: 0;">Ngày báo cáo</label>
-        <button id="btnNextDay" class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 13px;">Sang ngày tiếp theo</button>
-      </div>
-      <input type="date" id="reportDate">
-      <div id="dateNotice" style="font-size: 13px; color: var(--green); margin-top: 8px; font-weight: 500;"></div>
-    </div>
-    
-    <div class="flex-row" style="margin-bottom: 12px;">
-      <div class="input-group flex-1">
-        <label>Ngày công</label>
-        <input type="number" id="workDay" value="1" min="1">
-      </div>
-      <div class="input-group flex-1">
-        <label>DS cũ (k)</label>
-        <input type="number" id="cumulative" value="0">
-      </div>
-      <div class="input-group flex-1">
-        <label>Đơn cũ</label>
-        <input type="number" id="cumulativeOrders" value="0" min="0">
-      </div>
-    </div>
-
-    <div class="input-group">
-      <label style="color: var(--orange);">Tiền rớt đơn kế toán báo trừ (k)</label>
-      <input type="number" id="deduction" value="0" style="border: 1px solid var(--orange);">
-    </div>
-
-    <div class="input-group">
-      <label>Nội dung đơn hàng (từ Zalo)</label>
-      <textarea id="rawText" rows="6" placeholder="Dán tin nhắn đơn hàng vào đây..."></textarea>
-    </div>
-
-    <button id="btnParseDate" class="btn btn-secondary" style="margin-bottom: 12px;">Lấy ngày từ văn bản</button>
-    <button id="btnCalculate" class="btn btn-primary">Tính toán báo cáo</button>
-  </div>
-
-  <!-- Card 4: Kết quả xuất báo cáo -->
-  <div class="card" id="reportResultCard" style="display: none;">
-    <h3>Kết quả báo cáo</h3>
-    <pre id="reportOutput"></pre>
-    <button id="btnCopy" class="btn btn-success" style="margin-top: 12px;">Sao chép gửi Zalo</button>
-    <div id="syncStatus" style="margin-top: 12px; text-align: center; font-size: 13.5px; color: var(--text-muted); font-weight: 500;"></div>
-  </div>
-
-  <!-- Card 5: Lịch sử & Tiện ích xuất dữ liệu -->
-  <div class="card">
-    <h3>Lịch sử & Tiện ích</h3>
-    <button id="btnExportCSV" class="btn" style="background: var(--excel); color: white; margin-bottom: 12px;">Tải file CSV</button>
-    <button id="btnClearHistory" class="btn btn-danger" style="margin-bottom: 16px;">Xóa lịch sử</button>
-    
-    <div id="historyList"></div>
-  </div>
-
-  <!-- Modal Popup xem chi tiết ngày -->
-  <div class="modal" id="detailModal">
-    <div class="modal-content">
-      <button class="modal-close" id="btnCloseModal">×</button>
-      <h3 style="margin-bottom: 12px; color: var(--text);">Chi tiết báo cáo</h3>
-      <div id="modalDate" style="font-weight: 600; margin-bottom: 12px; font-size: 15px;"></div>
-      
-      <label style="font-size: 13px; font-weight: 500; color: var(--text-muted);">Báo cáo hoàn chỉnh:</label>
-      <pre id="modalReportText"></pre>
-      <button class="btn btn-success" id="btnModalCopyReport" style="margin-bottom: 16px;">Sao chép báo cáo</button>
-      
-      <label style="font-size: 13px; font-weight: 500; color: var(--text-muted);">Đơn hàng gốc:</label>
-      <pre id="modalRawText" style="max-height: 150px; overflow-y: auto;"></pre>
-      <button class="btn btn-secondary" id="btnModalCopyRaw">Sao chép đơn hàng gốc</button>
-    </div>
-  </div>
-
+  <!-- ═══════════════════════════════════════════════ SCRIPT ══════ -->
   <script>
-    // -------------------------------------------------------------
-    // 1. Cấu hình & Trạng thái lưu trữ (localStorage)
-    // -------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────
+    // 1. STATE & CONSTANTS
+    // ─────────────────────────────────────────────────────────────
     const STATE_KEYS = {
       employeeName: 'employeeName',
       kpiMonthRevenue: 'kpiMonthRevenue',
@@ -310,39 +602,145 @@
       const n = Math.round(Number(num) || 0);
       return (n >= 1000) ? Math.round(n / 1000) + 'tr' : n + 'k';
     };
+    const fmtK = (num) => new Intl.NumberFormat('vi-VN').format(Math.round(num)) + 'k';
 
-    // -------------------------------------------------------------
-    // 2. Quy tắc chuyển ngày & Năm nhuận (calculateNextDay)
-    // -------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────
+    // 2. TAB NAVIGATION
+    // ─────────────────────────────────────────────────────────────
+    function switchTab(viewId, title) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('tab-active');
+        tab.classList.add('text-on-surface-variant');
+        tab.classList.remove('text-primary');
+      });
+
+      const target = document.getElementById(viewId);
+      if (target) target.classList.add('active');
+
+      const activeNav = document.querySelector(`.nav-tab[data-view="${viewId}"]`);
+      if (activeNav) {
+        activeNav.classList.add('tab-active', 'text-primary');
+        activeNav.classList.remove('text-on-surface-variant');
+      }
+
+      document.getElementById('header-title').innerText = title;
+
+      if (viewId === 'view-lich-su') refreshHistoryView();
+    }
+
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchTab(tab.dataset.view, tab.dataset.title);
+      });
+    });
+
+    // ─────────────────────────────────────────────────────────────
+    // 3. CORE LOGIC: calculateNextDay (preserved 100%)
+    // ─────────────────────────────────────────────────────────────
     function calculateNextDay(d, m, y) {
       const isLeap = (y % 400 === 0) || (y % 4 === 0 && y % 100 !== 0);
       const daysInMonth = [0, 31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
       let nextD = d + 1;
       let nextM = m;
       let nextY = y;
-
       if (nextD > daysInMonth[m]) {
         nextD = 1;
         nextM = m + 1;
-        if (nextM > 12) {
-          nextM = 1;
-          nextY = y + 1;
-        }
+        if (nextM > 12) { nextM = 1; nextY = y + 1; }
       }
       return { d: nextD, m: nextM, y: nextY, isFirstOfMonth: nextD === 1 };
     }
 
-    function updateStaffDisplay(name) {
-      const display = (name || '').trim();
-      const el = document.getElementById('headerStaffDisplay');
-      if (el) el.innerText = display ? `NV: ${display}` : 'NV: ...';
+    // ─────────────────────────────────────────────────────────────
+    // 4. CORE LOGIC: parsePrice (preserved 100%)
+    // ─────────────────────────────────────────────────────────────
+    function parsePrice(str) {
+      if (!str) return 0;
+      let s = str.trim();
+      if (/^\d+[.,]\d{3}$/.test(s)) return parseFloat(s.replace(/[.,]/g, ''));
+      return parseFloat(s.replace(/,/g, '.'));
     }
 
-    // -------------------------------------------------------------
-    // 3. Khởi tạo & Đồng bộ Form
-    // -------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────
+    // 5. CORE LOGIC: splitOrders (preserved 100%)
+    // ─────────────────────────────────────────────────────────────
+    function splitOrders(text) {
+      const orderRegex = /(?:đơn\s*hàng|đơn|đh|dh)\s*(?:\d+[:\s\.\-]|[:\.\-]|\d+\b)/gi;
+      let matches = [];
+      let match;
+      while ((match = orderRegex.exec(text)) !== null) matches.push(match.index);
+      if (matches.length === 0) return [text];
+      let orders = [];
+      for (let i = 0; i < matches.length; i++) {
+        let start = matches[i];
+        let end = i === matches.length - 1 ? text.length : matches[i + 1];
+        orders.push(text.substring(start, end));
+      }
+      return orders;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 6. CORE LOGIC: detectDiscount (preserved 100%)
+    // ─────────────────────────────────────────────────────────────
+    function detectDiscount(text) {
+      const hasCk5 = /(?:ck|chiết\s*khấu|chiet\s*khau)[\s:]*5(?:\%|\b)/i.test(text);
+      const hasCk3 = /(?:ck|chiết\s*khấu|chiet\s*khau)[\s:]*3(?:\%|\b)/i.test(text);
+      if (hasCk5) return 5;
+      if (hasCk3) return 3;
+      return 0;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 7. CORE LOGIC: parseDateFromText (preserved 100%)
+    // ─────────────────────────────────────────────────────────────
+    function parseDateFromText(text) {
+      const textMatch = text.match(/ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})(?:\s+năm\s+(\d{2,4}))?/i);
+      if (textMatch) {
+        let d = parseInt(textMatch[1]), m = parseInt(textMatch[2]);
+        let y = textMatch[3] ? parseInt(textMatch[3]) : new Date().getFullYear();
+        if (y < 100) y += 2000;
+        return { d, m, y };
+      }
+      const numMatch = text.match(/(?:ngày\s+)?(\d{1,2})[\/\-\.](\d{1,2})(?:[\/\-\.](\d{2,4}))?/i);
+      if (numMatch) {
+        let d = parseInt(numMatch[1]), m = parseInt(numMatch[2]);
+        let y = numMatch[3] ? parseInt(numMatch[3]) : new Date().getFullYear();
+        if (y < 100) y += 2000;
+        return { d, m, y };
+      }
+      return null;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 8. GENERATE REPORT TEXT (original format — preserved 100%)
+    // ─────────────────────────────────────────────────────────────
+    function generateReportText({ dateStr, workDay, kpiStandardDays, netRevenue, newCumulative,
+      kpiMonthRevenue, kpiDayRevenue, validOrderCount, newOrders, kpiTotalOrders,
+      count3, count5, staffName }) {
+      const timeProgress = Math.round((workDay / kpiStandardDays) * 100);
+      const monthProgress = Math.round((newCumulative / kpiMonthRevenue) * 100);
+      const dayProgress = Math.round((netRevenue / kpiDayRevenue) * 100);
+      const orderProgress = Math.round((newOrders / kpiTotalOrders) * 100);
+
+      let reportText = `Báo cáo bán hàng ngày:      ${dateStr}\n\n`;
+      reportText += `- NV: ${staffName}\n\n`;
+      reportText += `- Tiến độ thời gian : ${workDay}/${kpiStandardDays}/${timeProgress}%\n\n`;
+      reportText += `- DS  bán giấy : ${fmt(netRevenue)}/${fmt(newCumulative)}/${fmtMonthKPI(kpiMonthRevenue)}\n\n`;
+      reportText += `- DS ngày : ${fmt(netRevenue)}/${kpiDayRevenue}/${dayProgress}%\n\n`;
+      reportText += `- Tiến độ % đạt: ${monthProgress}%\n\n`;
+      reportText += `- Đơn hàng: ${validOrderCount}/${newOrders}/${kpiTotalOrders}/${orderProgress}%\n\n`;
+      reportText += `- Trưng bày 3%: ${count3 > 0 ? count3 : 'o'}`;
+      if (count5 > 0) reportText += `\n\n- Trưng bày 5%: ${count5}`;
+      return reportText;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 9. INIT
+    // ─────────────────────────────────────────────────────────────
     function init() {
-      // Tải và lắng nghe cài đặt KPI & tên nhân viên
+      // Load KPI from localStorage
       Object.keys(DEFAULT_KPI).forEach(key => {
         const val = localStorage.getItem(key) || DEFAULT_KPI[key];
         const el = document.getElementById(key);
@@ -350,65 +748,83 @@
           el.value = val;
           el.addEventListener('input', (e) => {
             localStorage.setItem(key, e.target.value);
-            if (key === 'employeeName') updateStaffDisplay(e.target.value);
+            if (key === 'employeeName') {
+              const settingsDisplay = document.getElementById('settings-emp-display');
+              if (settingsDisplay) settingsDisplay.innerText = e.target.value;
+            }
           });
         }
       });
 
-      const currentStaff = document.getElementById('employeeName') ? document.getElementById('employeeName').value : 'HÙNG DŨNG';
-      updateStaffDisplay(currentStaff);
-
-      // Mặc định ngày hôm nay
       const today = new Date();
       setReportDate(today);
       updateHistoryUI();
+      updateMonthlyWidgets(today.getMonth() + 1, today.getFullYear());
+      updateHeaderMonthBadge(today.getMonth() + 1, today.getFullYear());
+
+      const savedName = localStorage.getItem('employeeName') || DEFAULT_KPI.employeeName;
+      const settingsDisplay = document.getElementById('settings-emp-display');
+      if (settingsDisplay) settingsDisplay.innerText = savedName;
+
+      // Update KPI settings daily note
+      updateAutoNote();
     }
 
+    function updateHeaderMonthBadge(m, y) {
+      const badge = document.getElementById('header-month-badge');
+      if (badge) badge.innerText = `T${m}/${y}`;
+      const displayBadge = document.getElementById('display-month-badge');
+      if (displayBadge) displayBadge.innerText = `Tháng ${m}/${y}`;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 10. DATE HANDLING
+    // ─────────────────────────────────────────────────────────────
     function setReportDate(dateObj) {
       const offset = dateObj.getTimezoneOffset();
       const localDate = new Date(dateObj.getTime() - (offset * 60 * 1000));
-      const dateString = localDate.toISOString().split('T')[0];
-      document.getElementById('reportDate').value = dateString;
+      document.getElementById('reportDate').value = localDate.toISOString().split('T')[0];
       handleDateChange(dateObj);
     }
 
     function handleDateChange(dateObj) {
-      const d = dateObj.getDate();
-      const m = dateObj.getMonth() + 1;
-      const y = dateObj.getFullYear();
+      const d = dateObj.getDate(), m = dateObj.getMonth() + 1, y = dateObj.getFullYear();
       document.getElementById('dateNotice').innerText = `✅ Đã chọn: Ngày ${d} tháng ${m} năm ${y}`;
-      
       updateMonthlyWidgets(m, y);
+      updateHeaderMonthBadge(m, y);
       autoFillNextDayData(dateObj);
     }
 
     document.getElementById('reportDate').addEventListener('change', (e) => {
       if (e.target.value) {
         const parts = e.target.value.split('-');
-        const dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-        handleDateChange(dateObj);
+        handleDateChange(new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
       }
     });
 
-    // Nút sang ngày tiếp theo
     document.getElementById('btnNextDay').addEventListener('click', () => {
-      const currentDateVal = document.getElementById('reportDate').value;
-      if (!currentDateVal) return;
-      const parts = currentDateVal.split('-');
-      const y = parseInt(parts[0]);
-      const m = parseInt(parts[1]);
-      const d = parseInt(parts[2]);
-      const next = calculateNextDay(d, m, y);
-      const nextDateObj = new Date(next.y, next.m - 1, next.d);
-      setReportDate(nextDateObj);
+      const val = document.getElementById('reportDate').value;
+      if (!val) return;
+      const parts = val.split('-');
+      const next = calculateNextDay(parseInt(parts[2]), parseInt(parts[1]), parseInt(parts[0]));
+      setReportDate(new Date(next.y, next.m - 1, next.d));
     });
 
-    // -------------------------------------------------------------
-    // 4. Widget Trưng bày theo tháng & Tự động Mùng 1
-    // -------------------------------------------------------------
+    document.getElementById('btnParseDate').addEventListener('click', () => {
+      const text = document.getElementById('rawText').value;
+      const res = parseDateFromText(text);
+      if (res && res.d > 0 && res.d <= 31 && res.m > 0 && res.m <= 12) {
+        setReportDate(new Date(res.y, res.m - 1, res.d));
+      } else {
+        showToast('Không tìm thấy ngày hợp lệ!', true);
+      }
+    });
+
+    // ─────────────────────────────────────────────────────────────
+    // 11. AUTO FILL & WIDGETS
+    // ─────────────────────────────────────────────────────────────
     function updateMonthlyWidgets(month, year) {
-      let count3 = 0;
-      let count5 = 0;
+      let count3 = 0, count5 = 0;
       historyData.forEach(item => {
         const [d, m, y] = item.date.split('/');
         if (parseInt(m) === month && parseInt(y) === year) {
@@ -418,24 +834,36 @@
       });
       document.getElementById('display3Count').innerText = count3;
       document.getElementById('display5Count').innerText = count5;
+
+      // Update mini progress bar
+      const kpiMonthRevenue = parseInt(localStorage.getItem('kpiMonthRevenue')) || DEFAULT_KPI.kpiMonthRevenue;
+      let totalCum = 0;
+      historyData.forEach(item => {
+        const [d, m, y] = item.date.split('/');
+        if (parseInt(m) === month && parseInt(y) === year) totalCum = Math.max(totalCum, item.cumulative || 0);
+      });
+      const pct = Math.min(100, Math.round((totalCum / kpiMonthRevenue) * 100));
+      const progressBar = document.getElementById('mini-progress-bar');
+      const progressLabel = document.getElementById('mini-month-progress');
+      const cumulativeLabel = document.getElementById('mini-cumulative-label');
+      const kpiLabel = document.getElementById('mini-kpi-label');
+      if (progressBar) progressBar.style.width = pct + '%';
+      if (progressLabel) progressLabel.innerText = pct + '%';
+      if (cumulativeLabel) cumulativeLabel.innerText = `Lũy kế: ${fmtK(totalCum)}`;
+      if (kpiLabel) kpiLabel.innerText = `Mục tiêu: ${fmtK(kpiMonthRevenue)}`;
     }
 
     function autoFillNextDayData(dateObj) {
       const targetMonth = dateObj.getMonth() + 1;
       const targetYear = dateObj.getFullYear();
-      
-      // Quy tắc Mùng 1: Ngày công về 1, Doanh số cũ = 0, Đơn cũ = 0
       if (dateObj.getDate() === 1) {
         document.getElementById('workDay').value = 1;
         document.getElementById('cumulative').value = 0;
         document.getElementById('cumulativeOrders').value = 0;
         return;
       }
-
       const reqTime = dateObj.getTime();
-      let latestReport = null;
-      let maxTime = 0;
-
+      let latestReport = null, maxTime = 0;
       historyData.forEach(item => {
         const [d, m, y] = item.date.split('/');
         if (parseInt(m) === targetMonth && parseInt(y) === targetYear) {
@@ -446,7 +874,6 @@
           }
         }
       });
-
       if (latestReport) {
         document.getElementById('workDay').value = parseInt(latestReport.workDay) + 1;
         document.getElementById('cumulative').value = Math.round(latestReport.cumulative);
@@ -458,362 +885,339 @@
       }
     }
 
-    // -------------------------------------------------------------
-    // 5. Bóc tách ngày từ text (parseDateFromText)
-    // -------------------------------------------------------------
-    function parseDateFromText(text) {
-      const textMatch = text.match(/ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})(?:\s+năm\s+(\d{2,4}))?/i);
-      if (textMatch) {
-        let d = parseInt(textMatch[1]);
-        let m = parseInt(textMatch[2]);
-        let y = textMatch[3] ? parseInt(textMatch[3]) : new Date().getFullYear();
-        if (y < 100) y += 2000;
-        return { d, m, y };
-      }
-
-      const numMatch = text.match(/(?:ngày\s+)?(\d{1,2})[\/\-\.](\d{1,2})(?:[\/\-\.](\d{2,4}))?/i);
-      if (numMatch) {
-        let d = parseInt(numMatch[1]);
-        let m = parseInt(numMatch[2]);
-        let y = numMatch[3] ? parseInt(numMatch[3]) : new Date().getFullYear();
-        if (y < 100) y += 2000;
-        return { d, m, y };
-      }
-      return null;
-    }
-
-    document.getElementById('btnParseDate').addEventListener('click', () => {
-      const text = document.getElementById('rawText').value;
-      const res = parseDateFromText(text);
-      if (res && res.d > 0 && res.d <= 31 && res.m > 0 && res.m <= 12) {
-        setReportDate(new Date(res.y, res.m - 1, res.d));
-      } else {
-        alert("Không tìm thấy ngày hợp lệ trong văn bản!");
-      }
-    });
-
-    // -------------------------------------------------------------
-    // 6. Phân tích giá, chiết khấu & Tính toán báo cáo
-    // -------------------------------------------------------------
-    function parsePrice(str) {
-      if (!str) return 0;
-      let s = str.trim();
-      // 3 chữ số sau dấu chấm/phẩy dạng 1.200 hoặc 1,200 -> 1200
-      if (/^\d+[.,]\d{3}$/.test(s)) {
-        return parseFloat(s.replace(/[.,]/g, ''));
-      }
-      // Dấu phẩy hoặc chấm thập phân dạng 35.5 hoặc 12,5
-      return parseFloat(s.replace(/,/g, '.'));
-    }
-
-    function splitOrders(text) {
-      const orderRegex = /(?:đơn\s*hàng|đơn|đh|dh)\s*(?:\d+[:\s\.\-]|[:\.\-]|\d+\b)/gi;
-      let matches = [];
-      let match;
-      while ((match = orderRegex.exec(text)) !== null) {
-        matches.push(match.index);
-      }
-      let orders = [];
-      if (matches.length === 0) {
-        orders.push(text);
-      } else {
-        for (let i = 0; i < matches.length; i++) {
-          let start = matches[i];
-          let end = i === matches.length - 1 ? text.length : matches[i + 1];
-          orders.push(text.substring(start, end));
-        }
-      }
-      return orders;
-    }
-
-    function detectDiscount(text) {
-      const hasCk5 = /(?:ck|chiết\s*khấu|chiet\s*khau)[\s:]*5(?:\%|\b)/i.test(text);
-      const hasCk3 = /(?:ck|chiết\s*khấu|chiet\s*khau)[\s:]*3(?:\%|\b)/i.test(text);
-      if (hasCk5) return 5;
-      if (hasCk3) return 3;
-      return 0;
-    }
-
+    // ─────────────────────────────────────────────────────────────
+    // 12. CALCULATE & SAVE REPORT
+    // ─────────────────────────────────────────────────────────────
     document.getElementById('btnCalculate').addEventListener('click', () => {
       const text = document.getElementById('rawText').value;
-      if (!text.trim()) {
-        alert("Vui lòng nhập nội dung đơn hàng!");
-        return;
-      }
-      
-      const orders = splitOrders(text);
-      let totalRevenue = 0;
-      let count3 = 0;
-      let count5 = 0;
-      let validOrderCount = 0;
+      if (!text.trim()) { showToast('Vui lòng nhập nội dung đơn hàng!', true); return; }
 
+      const orders = splitOrders(text);
+      let totalRevenue = 0, count3 = 0, count5 = 0, validOrderCount = 0;
       const itemRegex = /(\d+)\s*(?:bành|lốc|thùng|cuộn|gói|hộp|bao|ram|cây|kg|xấp|banh|loc|thung|cuon|goi|hop)?\s*[x*]\s*([\d\.,]+)/gi;
 
       orders.forEach(orderText => {
-        let orderTotal = 0;
-        let itemMatch;
-        let hasItems = false;
-        
+        let orderTotal = 0, hasItems = false;
         itemRegex.lastIndex = 0;
+        let itemMatch;
         while ((itemMatch = itemRegex.exec(orderText)) !== null) {
           hasItems = true;
           let qty = parseInt(itemMatch[1]);
           let price = parsePrice(itemMatch[2]);
-          if (!isNaN(qty) && !isNaN(price)) {
-            orderTotal += qty * price;
-          }
+          if (!isNaN(qty) && !isNaN(price)) orderTotal += qty * price;
         }
-
         if (hasItems) {
           validOrderCount++;
           const ck = detectDiscount(orderText);
-          if (ck === 5) {
-            orderTotal = orderTotal * 0.95;
-            count5++;
-          } else if (ck === 3) {
-            orderTotal = orderTotal * 0.97;
-            count3++;
-          }
+          if (ck === 5) { orderTotal *= 0.95; count5++; }
+          else if (ck === 3) { orderTotal *= 0.97; count3++; }
           totalRevenue += orderTotal;
         }
       });
 
       const deduction = Math.round(parseFloat(document.getElementById('deduction').value) || 0);
       const netRevenue = Math.round(totalRevenue - deduction);
-      
       const prevCumulative = Math.round(parseFloat(document.getElementById('cumulative').value) || 0);
       const newCumulative = Math.round(prevCumulative + netRevenue);
-      
       const prevOrders = parseInt(document.getElementById('cumulativeOrders').value) || 0;
       const newOrders = prevOrders + validOrderCount;
-      
       const workDay = parseInt(document.getElementById('workDay').value) || 1;
-      const kpiStandardDays = parseInt(document.getElementById('kpiStandardDays').value) || 25;
-      const kpiMonthRevenue = Math.round(parseFloat(document.getElementById('kpiMonthRevenue').value) || 120000);
-      const kpiDayRevenue = Math.round(parseFloat(document.getElementById('kpiDayRevenue').value) || 4600);
-      const kpiTotalOrders = parseInt(document.getElementById('kpiTotalOrders').value) || 175;
-
+      const kpiStandardDays = parseInt(document.getElementById('kpiStandardDays').value) || DEFAULT_KPI.kpiStandardDays;
+      const kpiMonthRevenue = Math.round(parseFloat(document.getElementById('kpiMonthRevenue').value) || DEFAULT_KPI.kpiMonthRevenue);
+      const kpiDayRevenue = Math.round(parseFloat(document.getElementById('kpiDayRevenue').value) || DEFAULT_KPI.kpiDayRevenue);
+      const kpiTotalOrders = parseInt(document.getElementById('kpiTotalOrders').value) || DEFAULT_KPI.kpiTotalOrders;
       const dateParts = document.getElementById('reportDate').value.split('-');
       const dateStr = `${parseInt(dateParts[2])}/${parseInt(dateParts[1])}/${parseInt(dateParts[0])}`;
+      const staffName = (document.getElementById('employeeName').value || '').trim() || DEFAULT_KPI.employeeName;
 
-      const timeProgress = Math.round((workDay / kpiStandardDays) * 100);
-      const monthProgress = Math.round((newCumulative / kpiMonthRevenue) * 100);
-      const dayProgress = Math.round((netRevenue / kpiDayRevenue) * 100);
-      const orderProgress = Math.round((newOrders / kpiTotalOrders) * 100);
-
-      const staffName = (document.getElementById('employeeName').value || '').trim() || 'HÙNG DŨNG';
-
-      // Tạo mẫu văn bản xuất ra gửi Zalo chuẩn theo SPEC mục 4
-      let reportText = `Báo cáo bán hàng ngày:      ${dateStr}\n\n`;
-      reportText += `- NV: ${staffName}\n\n`;
-      reportText += `- Tiến độ thời gian : ${workDay}/${kpiStandardDays}/${timeProgress}%\n\n`;
-      reportText += `- DS  bán giấy : ${fmt(netRevenue)}/${fmt(newCumulative)}/${fmtMonthKPI(kpiMonthRevenue)}\n\n`;
-      reportText += `- DS ngày : ${fmt(netRevenue)}/${kpiDayRevenue}/${dayProgress}%\n\n`;
-      reportText += `- Tiến độ % đạt: ${monthProgress}%\n\n`;
-      reportText += `- Đơn hàng: ${validOrderCount}/${newOrders}/${kpiTotalOrders}/${orderProgress}%\n\n`;
-      reportText += `- Trưng bày 3%: ${count3 > 0 ? count3 : 'o'}`;
-      if (count5 > 0) {
-        reportText += `\n\n- Trưng bày 5%: ${count5}`;
-      }
+      const reportText = generateReportText({
+        dateStr, workDay, kpiStandardDays, netRevenue, newCumulative,
+        kpiMonthRevenue, kpiDayRevenue, validOrderCount, newOrders, kpiTotalOrders,
+        count3, count5, staffName
+      });
 
       document.getElementById('reportOutput').innerText = reportText;
-      document.getElementById('reportResultCard').style.display = 'block';
+      const resultCard = document.getElementById('reportResultCard');
+      resultCard.classList.remove('hidden');
+      resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-      // Lưu vào Lịch sử
+      // Save record
       const record = {
-        id: Date.now(),
-        date: dateStr,
-        employeeName: staffName,
-        workDay: workDay,
-        orders: validOrderCount,
-        revenue: Math.round(netRevenue),
-        deduction: Math.round(deduction),
-        cumulative: Math.round(newCumulative),
-        cumulativeOrders: newOrders,
-        count3: count3,
-        count5: count5,
-        rawText: text,
-        reportText: reportText
+        id: Date.now(), date: dateStr, employeeName: staffName,
+        workDay, orders: validOrderCount, revenue: Math.round(netRevenue),
+        deduction, cumulative: Math.round(newCumulative), cumulativeOrders: newOrders,
+        count3, count5, rawText: text, reportText
       };
-
-      // Ghi đè nếu cùng ngày
       historyData = historyData.filter(h => h.date !== dateStr);
       historyData.push(record);
       historyData.sort((a, b) => {
-        let da = a.date.split('/'); let db = b.date.split('/');
-        let dateA = new Date(parseInt(da[2]), parseInt(da[1]) - 1, parseInt(da[0])).getTime();
-        let dateB = new Date(parseInt(db[2]), parseInt(db[1]) - 1, parseInt(db[0])).getTime();
-        if (dateB === dateA) return b.id - a.id;
-        return dateB - dateA;
+        let da = a.date.split('/'), db = b.date.split('/');
+        let dA = new Date(parseInt(da[2]), parseInt(da[1]) - 1, parseInt(da[0])).getTime();
+        let dB = new Date(parseInt(db[2]), parseInt(db[1]) - 1, parseInt(db[0])).getTime();
+        return dB === dA ? b.id - a.id : dB - dA;
       });
-      
       localStorage.setItem(STATE_KEYS.history, JSON.stringify(historyData));
       updateHistoryUI();
       updateMonthlyWidgets(parseInt(dateParts[1]), parseInt(dateParts[0]));
 
-      // Tự động sao chép vào bộ nhớ tạm
-      copyToClipboard(reportText);
+      // Auto copy
+      copyToClipboard(reportText, false);
     });
 
-    // -------------------------------------------------------------
-    // 7. Tiện ích Sao chép (Clipboard) & Đồng bộ Google Drive
-    // -------------------------------------------------------------
-    document.getElementById('btnCopy').addEventListener('click', () => {
-      copyToClipboard(document.getElementById('reportOutput').innerText);
-    });
-
-    function copyToClipboard(text) {
+    // ─────────────────────────────────────────────────────────────
+    // 13. CLIPBOARD
+    // ─────────────────────────────────────────────────────────────
+    function copyToClipboard(text, notify = true) {
+      const doNotify = () => { if (notify) showToast('Đã sao chép báo cáo!'); };
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => {
-          showSyncNotice("📋 Đã sao chép báo cáo vào bộ nhớ tạm!", "var(--green)");
-        }).catch(() => fallbackCopyTextToClipboard(text));
+        navigator.clipboard.writeText(text).then(doNotify).catch(() => fallbackCopy(text, notify));
       } else {
-        fallbackCopyTextToClipboard(text);
+        fallbackCopy(text, notify);
       }
     }
 
-    function fallbackCopyTextToClipboard(text) {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      textArea.style.top = "0"; textArea.style.left = "0"; textArea.style.position = "fixed";
-      document.body.appendChild(textArea);
-      textArea.focus(); textArea.select();
-      try {
-        document.execCommand('copy');
-        showSyncNotice("📋 Đã sao chép báo cáo vào bộ nhớ tạm!", "var(--green)");
-      } catch (err) {}
-      document.body.removeChild(textArea);
+    function fallbackCopy(text, notify = true) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.left = '0'; ta.style.top = '0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      try { document.execCommand('copy'); if (notify) showToast('Đã sao chép!'); } catch (e) {}
+      document.body.removeChild(ta);
     }
 
-    function showSyncNotice(msg, color) {
-      const el = document.getElementById('syncStatus');
-      if (el) {
-        el.innerText = msg;
-        el.style.color = color || "var(--text-muted)";
+    document.getElementById('btnCopy').addEventListener('click', () => {
+      const text = document.getElementById('reportOutput').innerText;
+      copyToClipboard(text);
+      // Animate button
+      const icon = document.getElementById('copy-icon');
+      const label = document.getElementById('copy-text');
+      if (icon && label) {
+        icon.textContent = 'check';
+        label.textContent = 'Đã chép!';
+        setTimeout(() => { icon.textContent = 'content_copy'; label.textContent = 'Sao chép'; }, 2000);
       }
-    }
+    });
 
-
-    // -------------------------------------------------------------
-    // 8. Danh sách Lịch sử & Modal chi tiết
-    // -------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────
+    // 14. HISTORY UI
+    // ─────────────────────────────────────────────────────────────
     function updateHistoryUI() {
       const list = document.getElementById('historyList');
+      if (!list) return;
       list.innerHTML = '';
       if (historyData.length === 0) {
-        list.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:14px; padding:12px;">Chưa có báo cáo nào.</div>';
+        list.innerHTML = '<div class="text-center text-on-surface-variant font-body-md py-8">Chưa có báo cáo nào.</div>';
         return;
       }
-
       historyData.forEach(item => {
-        const el = document.createElement('div');
-        el.className = 'history-item';
-        el.innerHTML = `
-          <div style="flex:1">
-            <div class="history-header">
-              <span class="history-date">${item.date}</span>
-              <span class="history-revenue">${fmt(item.revenue)}k</span>
+        const div = document.createElement('div');
+        div.className = 'bg-surface-container-lowest rounded-xl p-space-md shadow-sm border border-outline-variant/20 flex flex-col gap-space-sm active:bg-surface-container-low transition-colors cursor-pointer relative overflow-hidden';
+        const today = new Date();
+        const todayStr = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+        const isToday = item.date === todayStr;
+        div.innerHTML = `
+          ${isToday ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-xl"></div>' : ''}
+          <div class="flex items-center justify-between ${isToday ? 'pl-2' : ''}">
+            <div class="flex items-center gap-space-xs">
+              <span class="font-headline-sm text-headline-sm text-on-surface font-bold">${item.date}</span>
+              ${isToday ? '<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-bold">Hôm nay</span>' : ''}
+              <span class="font-label-sm text-label-sm text-on-surface-variant">• Ngày công ${item.workDay}</span>
             </div>
-            <div class="history-summary">Đơn: ${item.orders} | T.Bày: ${item.count3} (3%), ${item.count5} (5%) | Lũy kế: ${fmt(item.cumulative)}k</div>
+            <div class="flex items-center gap-1 text-secondary font-label-sm text-label-sm font-semibold">
+              <span class="material-symbols-outlined text-[16px]">check_circle</span>
+              Đã lưu
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-space-sm bg-surface-container-low rounded-lg px-space-sm py-space-xs">
+            <div>
+              <span class="font-label-sm text-label-sm text-on-surface-variant block">Doanh số ngày</span>
+              <span class="font-headline-sm text-headline-sm text-primary font-bold font-mono">${fmt(item.revenue)}k</span>
+            </div>
+            <div>
+              <span class="font-label-sm text-label-sm text-on-surface-variant block">Lũy tiến tháng</span>
+              <span class="font-label-lg text-label-lg text-on-surface font-semibold font-mono">${fmt(item.cumulative)}k</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px] text-outline">shopping_bag</span>
+              ${item.orders} đơn | TB: ${item.count3}(3%) ${item.count5}(5%)
+            </span>
+            <span class="material-symbols-outlined text-on-surface-variant text-[18px]">chevron_right</span>
           </div>
         `;
-        el.addEventListener('click', () => openModal(item));
-        list.appendChild(el);
+        div.addEventListener('click', () => openDetailModal(item));
+        list.appendChild(div);
       });
     }
 
-    const modal = document.getElementById('detailModal');
-    let currentModalItem = null;
+    function refreshHistoryView() {
+      updateHistoryUI();
+      const today = new Date();
+      const m = today.getMonth() + 1, y = today.getFullYear();
+      const kpiMonthRevenue = parseInt(localStorage.getItem('kpiMonthRevenue')) || DEFAULT_KPI.kpiMonthRevenue;
 
-    function openModal(item) {
-      currentModalItem = item;
-      document.getElementById('modalDate').innerText = "Ngày: " + item.date;
-      document.getElementById('modalReportText').innerText = item.reportText || "Không có văn bản báo cáo.";
-      document.getElementById('modalRawText').innerText = item.rawText || "Không có đơn hàng gốc.";
-      modal.classList.add('active');
+      let monthItems = historyData.filter(h => {
+        const pts = h.date.split('/');
+        return parseInt(pts[1]) === m && parseInt(pts[2]) === y;
+      });
+      const totalCum = monthItems.reduce((s, h) => Math.max(s, h.cumulative || 0), 0);
+      const pct = Math.min(100, Math.round((totalCum / kpiMonthRevenue) * 100));
+
+      document.getElementById('history-month-title').innerText = `Tháng ${m}/${y}`;
+      document.getElementById('history-record-count').innerText = `${monthItems.length} Báo Cáo`;
+      document.getElementById('history-total-rev').innerText = fmtK(totalCum);
+      document.getElementById('history-progress-bar').style.width = pct + '%';
+      document.getElementById('history-days-worked').innerText = `${monthItems.length} ngày báo cáo`;
+      document.getElementById('history-progress-pct').innerText = `Tiến độ: ${pct}%`;
     }
 
-    document.getElementById('btnCloseModal').addEventListener('click', () => {
-      modal.classList.remove('active');
-    });
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) modal.classList.remove('active');
+    // ─────────────────────────────────────────────────────────────
+    // 15. DETAIL MODAL
+    // ─────────────────────────────────────────────────────────────
+    let currentModalItem = null;
+
+    function openDetailModal(item) {
+      currentModalItem = item;
+      document.getElementById('modalDayTag').innerText = `Ngày công ${item.workDay}`;
+      document.getElementById('modalDate').innerText = `Báo cáo ngày ${item.date}`;
+      document.getElementById('modalRevenue').innerText = `${fmt(item.revenue)}k`;
+      document.getElementById('modalCumulative').innerText = `${fmt(item.cumulative)}k`;
+      document.getElementById('modalOrders').innerText = `${item.orders} đơn`;
+      document.getElementById('modalDeduction').innerText = `${item.deduction || 0}k`;
+      document.getElementById('modalDisplay').innerText = `${item.count3 || 0} / ${item.count5 || 0}`;
+      document.getElementById('modalReportText').innerText = item.reportText || '(Không có văn bản)';
+      document.getElementById('modalRawText').innerText = item.rawText || '(Không có đơn gốc)';
+
+      const modal = document.getElementById('detailModal');
+      const sheet = document.getElementById('detailModalSheet');
+      modal.classList.add('modal-bg-open');
+      setTimeout(() => sheet.classList.add('sheet-open'), 10);
+    }
+
+    function closeDetailModal() {
+      const modal = document.getElementById('detailModal');
+      const sheet = document.getElementById('detailModalSheet');
+      sheet.classList.remove('sheet-open');
+      setTimeout(() => modal.classList.remove('modal-bg-open'), 300);
+    }
+
+    document.getElementById('btnCloseModal').addEventListener('click', closeDetailModal);
+    document.getElementById('detailModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('detailModal')) closeDetailModal();
     });
 
     document.getElementById('btnModalCopyReport').addEventListener('click', () => {
-      if (currentModalItem && currentModalItem.reportText) {
-        copyToClipboard(currentModalItem.reportText);
-      }
+      if (currentModalItem?.reportText) copyToClipboard(currentModalItem.reportText);
     });
-
     document.getElementById('btnModalCopyRaw').addEventListener('click', () => {
-      if (currentModalItem && currentModalItem.rawText) {
-        copyToClipboard(currentModalItem.rawText);
-      }
+      if (currentModalItem?.rawText) copyToClipboard(currentModalItem.rawText);
     });
 
-    // -------------------------------------------------------------
-    // 9. Tiện ích Xuất CSV & Xóa Lịch sử
-    // -------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────
+    // 16. CLEAR HISTORY & EXPORT CSV
+    // ─────────────────────────────────────────────────────────────
     document.getElementById('btnClearHistory').addEventListener('click', () => {
-      if (confirm("⚠️ CẢNH BÁO: Bạn có chắc chắn muốn XÓA TOÀN BỘ LỊCH SỬ không? Cấu hình KPI sẽ được giữ nguyên.")) {
+      if (confirm('⚠️ Xóa toàn bộ lịch sử? Không thể hoàn tác.')) {
         historyData = [];
         localStorage.removeItem(STATE_KEYS.history);
         updateHistoryUI();
+        refreshHistoryView();
         const dateParts = document.getElementById('reportDate').value.split('-');
         updateMonthlyWidgets(parseInt(dateParts[1]), parseInt(dateParts[0]));
-        alert("Đã xóa sạch lịch sử báo cáo!");
+        showToast('Đã xóa toàn bộ lịch sử!');
       }
     });
 
     document.getElementById('btnExportCSV').addEventListener('click', () => {
-      if (historyData.length === 0) {
-        alert("Chưa có lịch sử để xuất file CSV!");
-        return;
-      }
-      
-      const headers = ["Ngày", "Ngày công", "Đơn trong ngày", "Tổng đơn", "DS ngày (k)", "Rớt đơn (k)", "DS lũy kế (k)", "Trưng bày 3%", "Trưng bày 5%", "Nội dung gốc"];
-      let csvContent = "\uFEFF"; // UTF-8 BOM cho Excel & Sheets
-      csvContent += headers.join(",") + "\n";
-      
+      if (historyData.length === 0) { showToast('Chưa có lịch sử để xuất!', true); return; }
+      const headers = ["Ngày","Ngày công","Đơn trong ngày","Tổng đơn","DS ngày (k)","Rớt đơn (k)","DS lũy kế (k)","Trưng bày 3%","Trưng bày 5%","Nội dung gốc"];
+      let csv = "\uFEFF" + headers.join(",") + "\n";
       historyData.forEach(item => {
-        let cleanRaw = item.rawText ? item.rawText.replace(/"/g, '""').replace(/\r?\n/g, ' ') : '';
-        const row = [
-          item.date,
-          item.workDay,
-          item.orders,
-          item.cumulativeOrders,
-          fmt(item.revenue),
-          item.deduction || 0,
-          fmt(item.cumulative),
-          item.count3 || 0,
-          item.count5 || 0,
-          `"${cleanRaw}"`
-        ];
-        csvContent += row.join(",") + "\n";
+        let raw = item.rawText ? item.rawText.replace(/"/g, '""').replace(/\r?\n/g, ' ') : '';
+        csv += [item.date, item.workDay, item.orders, item.cumulativeOrders,
+          fmt(item.revenue), item.deduction || 0, fmt(item.cumulative),
+          item.count3 || 0, item.count5 || 0, `"${raw}"`].join(",") + "\n";
       });
-      
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `BaoCaoBanHang_HungDung_${Date.now()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `BaoCaoBanHang_HungDung_${Date.now()}.csv`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      showToast('Đã tải file CSV!');
     });
 
-    // -------------------------------------------------------------
-    // 10. Đăng ký Service Worker (PWA Offline)
-    // -------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────
+    // 17. KPI SETTINGS
+    // ─────────────────────────────────────────────────────────────
+    function updateAutoNote() {
+      const m = parseFloat(document.getElementById('kpiMonthRevenue')?.value) || 0;
+      const d = parseFloat(document.getElementById('kpiStandardDays')?.value) || 25;
+      const pace = Math.round(m / (d || 1));
+      const note = document.getElementById('daily-auto-note');
+      if (note) note.textContent = `≈ ${pace.toLocaleString('vi-VN')}k (tự tính)`;
+    }
+
+    document.getElementById('kpiMonthRevenue').addEventListener('input', updateAutoNote);
+    document.getElementById('kpiStandardDays').addEventListener('input', updateAutoNote);
+
+    document.getElementById('btnAutoCalc').addEventListener('click', () => {
+      const m = parseFloat(document.getElementById('kpiMonthRevenue').value) || 0;
+      const d = parseFloat(document.getElementById('kpiStandardDays').value) || 25;
+      const pace = Math.round(m / (d || 1));
+      document.getElementById('kpiDayRevenue').value = pace;
+      updateAutoNote();
+      showToast(`DS ngày tự tính: ${pace.toLocaleString('vi-VN')}k`);
+    });
+
+    document.getElementById('btnSaveKPI').addEventListener('click', () => {
+      ['kpiMonthRevenue', 'kpiDayRevenue', 'kpiTotalOrders', 'kpiStandardDays'].forEach(key => {
+        const el = document.getElementById(key);
+        if (el) localStorage.setItem(key, el.value);
+      });
+      const btn = document.getElementById('btnSaveKPI');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[20px]">check</span><span>Đã Lưu!</span>';
+      btn.disabled = true;
+      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+      showToast('Đã lưu cài đặt chỉ tiêu!');
+
+      const today = new Date();
+      updateMonthlyWidgets(today.getMonth() + 1, today.getFullYear());
+    });
+
+    // ─────────────────────────────────────────────────────────────
+    // 18. TOAST
+    // ─────────────────────────────────────────────────────────────
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-text');
+      if (!toast || !text) return;
+      text.textContent = message;
+      toast.classList.remove('opacity-0', 'scale-90');
+      toast.classList.add('opacity-100', 'scale-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'scale-100');
+        toast.classList.add('opacity-0', 'scale-90');
+      }, 2500);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 19. SERVICE WORKER (PWA)
+    // ─────────────────────────────────────────────────────────────
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
     }
 
-    // Khởi chạy ứng dụng
+    // ─────────────────────────────────────────────────────────────
+    // START
+    // ─────────────────────────────────────────────────────────────
     init();
   </script>
+
 </body>
 </html>
