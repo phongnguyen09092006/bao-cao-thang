@@ -124,18 +124,247 @@
   <style>
     @layer base {
       html, body { width: 100vw; margin: 0; padding: 0; }
-      body { overscroll-behavior: none; font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; }
+      body {
+        overscroll-behavior: none;
+        font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
       .pb-safe { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem); }
       .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
       ::-webkit-scrollbar { display: none; }
     }
-    .view-section { display: none; }
-    .view-section.active { display: flex; flex-direction: column; }
+
+    /* ═══════════════════════════════════════════════ TAB & VIEW MOTION ═══ */
+    .view-section { display: none; opacity: 0; }
+    .view-section.active {
+      display: flex;
+      flex-direction: column;
+      animation: viewSlideUp 0.36s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes viewSlideUp {
+      0% {
+        opacity: 0;
+        transform: translateY(14px) scale(0.995);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Staggered card entrance */
+    .stagger-1 { animation: cardEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) 30ms backwards; }
+    .stagger-2 { animation: cardEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) 80ms backwards; }
+    .stagger-3 { animation: cardEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) 130ms backwards; }
+    .stagger-4 { animation: cardEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) 180ms backwards; }
+
+    @keyframes cardEntrance {
+      0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════ NAVIGATION MOTION ═══ */
     .tab-active { color: #004ac6 !important; font-weight: 700; }
-    .tab-active span.material-symbols-outlined { font-variation-settings: 'FILL' 1; }
-    /* Bottom sheet modal animation */
-    .sheet-open { transform: translateY(0) !important; }
-    .modal-bg-open { opacity: 1 !important; pointer-events: auto !important; }
+    .tab-active span.material-symbols-outlined {
+      font-variation-settings: 'FILL' 1;
+      animation: navIconPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes navIconPop {
+      0% { transform: scale(0.8); }
+      50% { transform: scale(1.22); }
+      100% { transform: scale(1); }
+    }
+    .nav-tab {
+      position: relative;
+      transition: color 0.25s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      touch-action: manipulation;
+    }
+    .nav-tab:active {
+      transform: scale(0.90);
+    }
+
+    /* ═══════════════════════════════════════════════ BUTTONS & MICRO-INTERACTIONS ═══ */
+    .btn-press {
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background 0.2s ease;
+      touch-action: manipulation;
+      will-change: transform;
+    }
+    .btn-press:active {
+      transform: scale(0.965);
+    }
+
+    /* Shimmer effect for CTA button */
+    .shimmer-cta {
+      position: relative;
+      overflow: hidden;
+    }
+    .shimmer-cta::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -100%;
+      width: 60%;
+      height: 200%;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.28) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(25deg);
+      animation: shimmerGlance 3.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      pointer-events: none;
+    }
+    @keyframes shimmerGlance {
+      0% { transform: translateX(-150%) rotate(25deg); }
+      35%, 100% { transform: translateX(450%) rotate(25deg); }
+    }
+
+    /* Ripple Wave Effect */
+    .btn-ripple {
+      position: relative;
+      overflow: hidden;
+    }
+    .ripple-wave {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: rippleAnimation 0.55s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+      background-color: rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+    }
+    .btn-ripple-dark .ripple-wave {
+      background-color: rgba(0, 74, 198, 0.18);
+    }
+    @keyframes rippleAnimation {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════ PROGRESS BAR SHIMMER ═══ */
+    .progress-bar-shimmer {
+      position: relative;
+      overflow: hidden;
+      transition: width 0.75s cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+    .progress-bar-shimmer::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.35) 50%,
+        transparent 100%
+      );
+      background-size: 200% 100%;
+      animation: progressSweep 2.4s infinite linear;
+      pointer-events: none;
+    }
+    @keyframes progressSweep {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* ═══════════════════════════════════════════════ RESULT CARD REVEAL ═══ */
+    .result-reveal-pop {
+      animation: resultCardPop 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes resultCardPop {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 74, 198, 0);
+      }
+      50% {
+        box-shadow: 0 0 24px 4px rgba(0, 74, 198, 0.18);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        box-shadow: 0 4px 16px -2px rgba(0, 74, 198, 0.08);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════ NUMBER BUMP & BADGES ═══ */
+    .number-bump {
+      animation: bumpScale 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: inline-block;
+    }
+    @keyframes bumpScale {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+
+    /* ═══════════════════════════════════════════════ HISTORY WATERFALL ═══ */
+    .history-card-in {
+      animation: historySlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .history-card-in:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px -4px rgba(0, 74, 198, 0.1);
+      border-color: rgba(0, 74, 198, 0.3);
+    }
+    .history-card-in:active {
+      transform: scale(0.985);
+    }
+    @keyframes historySlide {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════ BOTTOM SHEET & MODAL ═══ */
+    .sheet-open {
+      transform: translateY(0) !important;
+    }
+    .modal-bg-open {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+    #detailModal {
+      transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #detailModalSheet {
+      transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+      will-change: transform;
+    }
+
+    /* ═══════════════════════════════════════════════ TOAST BOUNCE ═══ */
+    #toast {
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      will-change: transform, opacity;
+    }
+
+    /* ═══════════════════════════════════════════════ ACCESSIBILITY ═══ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
   </style>
 </head>
 
@@ -166,16 +395,16 @@
     <section id="view-lap-bao-cao" class="view-section active flex-col gap-space-lg pt-space-lg pb-space-xl">
 
       <!-- Card: Thông tin nhân viên + KPI tóm tắt -->
-      <div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-md">
+      <div class="stagger-1 bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-md hover:border-primary/30 transition-all">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-space-sm min-w-0">
-            <div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center shrink-0">
+            <div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center shrink-0 shadow-sm">
               <span class="material-symbols-outlined text-primary text-[20px]">person</span>
             </div>
             <div class="flex items-center gap-space-xs min-w-0">
               <input id="employeeName" type="text" value="HÙNG DŨNG"
                 class="font-headline-sm text-headline-sm text-on-surface bg-transparent focus:outline-none focus:bg-surface-container-low rounded px-1 transition-colors truncate w-full max-w-[140px]">
-              <button onclick="document.getElementById('employeeName').focus()" type="button" class="text-outline hover:text-primary transition-colors shrink-0">
+              <button onclick="document.getElementById('employeeName').focus()" type="button" class="btn-press text-outline hover:text-primary transition-colors shrink-0">
                 <span class="material-symbols-outlined text-[15px]">edit</span>
               </button>
             </div>
@@ -188,7 +417,7 @@
         </div>
         <!-- Progress bar -->
         <div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
-          <div id="mini-progress-bar" class="h-full rounded-full transition-all duration-500" style="width:0%; background: linear-gradient(90deg, #004ac6 0%, #2563eb 60%, #4edea3 100%);"></div>
+          <div id="mini-progress-bar" class="progress-bar-shimmer h-full rounded-full transition-all duration-500" style="width:0%; background: linear-gradient(90deg, #004ac6 0%, #2563eb 60%, #4edea3 100%);"></div>
         </div>
         <div class="flex justify-between text-label-sm text-outline">
           <span id="mini-cumulative-label">Lũy kế: 0k</span>
@@ -197,25 +426,25 @@
       </div>
 
       <!-- Card: Trưng bày tháng -->
-      <div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-md">
+      <div class="stagger-2 bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-md hover:border-primary/30 transition-all">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-space-xs">
-            <div class="w-7 h-7 rounded-lg bg-tertiary-fixed flex items-center justify-center">
+            <div class="w-7 h-7 rounded-lg bg-tertiary-fixed flex items-center justify-center shadow-sm">
               <span class="material-symbols-outlined text-tertiary text-[18px]">workspace_premium</span>
             </div>
-            <span class="font-headline-sm text-headline-sm text-on-surface">Trưng Bày Tháng</span>
+            <span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Trưng Bày Tháng</span>
           </div>
           <span class="font-label-sm text-label-sm text-outline bg-surface-container px-2 py-0.5 rounded-full" id="display-month-badge">Tháng hiện tại</span>
         </div>
         <div class="grid grid-cols-2 gap-space-md">
-          <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col items-center">
+          <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col items-center hover:bg-surface-container transition-colors">
             <span class="font-label-md text-label-md text-on-surface-variant mb-1">Gói TB 3%</span>
             <div class="flex items-baseline gap-1">
               <span class="text-[28px] font-bold font-mono text-on-surface leading-none" id="display3Count">0</span>
               <span class="font-label-md text-label-md text-outline">đơn</span>
             </div>
           </div>
-          <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col items-center">
+          <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col items-center hover:bg-surface-container transition-colors">
             <span class="font-label-md text-label-md text-on-surface-variant mb-1">Gói TB 5%</span>
             <div class="flex items-baseline gap-1">
               <span class="text-[28px] font-bold font-mono text-on-surface leading-none" id="display5Count">0</span>
@@ -226,33 +455,33 @@
       </div>
 
       <!-- Card: Form nhập báo cáo hàng ngày -->
-      <div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-md">
+      <div class="stagger-3 bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-md hover:border-primary/30 transition-all">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-space-xs">
-            <div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center">
+            <div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center shadow-sm">
               <span class="material-symbols-outlined text-primary text-[18px]">edit_calendar</span>
             </div>
-            <span class="font-headline-sm text-headline-sm text-on-surface">Nhập Báo Cáo</span>
+            <span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Nhập Báo Cáo</span>
           </div>
-          <span class="font-label-sm text-label-sm bg-secondary-container text-on-secondary-container px-2.5 py-1 rounded-full font-medium">Hôm nay</span>
+          <span class="font-label-sm text-label-sm bg-secondary-container text-on-secondary-container px-2.5 py-1 rounded-full font-medium shadow-sm">Hôm nay</span>
         </div>
 
         <!-- Ngày + Ngày công -->
         <div class="grid grid-cols-2 gap-space-sm">
           <div class="flex flex-col gap-1">
             <label class="font-label-sm text-label-sm text-outline" for="reportDate">Ngày báo cáo</label>
-            <div class="h-11 bg-surface-container-low rounded-lg px-3 flex items-center gap-2">
+            <div class="h-11 bg-surface-container-low rounded-lg px-3 flex items-center gap-2 border border-transparent focus-within:border-primary/40 focus-within:bg-surface-container-lowest transition-all">
               <span class="material-symbols-outlined text-outline text-[18px]">calendar_today</span>
               <input id="reportDate" type="date" class="w-full bg-transparent font-label-md text-label-md text-on-surface focus:outline-none">
             </div>
           </div>
           <div class="flex flex-col gap-1">
             <label class="font-label-sm text-label-sm text-outline" for="workDay">Ngày công thứ</label>
-            <div class="h-11 bg-surface-container-low rounded-lg px-3 flex items-center gap-2">
+            <div class="h-11 bg-surface-container-low rounded-lg px-3 flex items-center gap-2 border border-transparent focus-within:border-primary/40 focus-within:bg-surface-container-lowest transition-all">
               <span class="material-symbols-outlined text-outline text-[18px]">event_repeat</span>
               <input id="workDay" type="number" value="1" min="1"
                 class="w-full bg-transparent font-label-md text-label-md text-on-surface focus:outline-none font-semibold">
-              <button id="btnNextDay" class="text-primary font-label-sm text-label-sm shrink-0 hover:text-primary-container transition-colors" title="Sang ngày tiếp theo">
+              <button id="btnNextDay" class="btn-press text-primary font-label-sm text-label-sm shrink-0 hover:text-primary-container hover:translate-x-0.5 transition-all p-1" title="Sang ngày tiếp theo">
                 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
               </button>
             </div>
@@ -263,7 +492,7 @@
         <div class="flex flex-col gap-space-sm">
           <div class="flex flex-col gap-1">
             <label class="font-label-sm text-label-sm text-outline" for="cumulative">Doanh số lũy kế trước hôm nay (k)</label>
-            <div class="h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between">
+            <div class="h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between border border-transparent focus-within:border-primary/40 focus-within:bg-surface-container-lowest transition-all">
               <input id="cumulative" type="number" value="0" placeholder="0"
                 class="w-full bg-transparent font-headline-sm text-headline-sm text-primary font-mono focus:outline-none">
               <span class="font-label-md text-label-md text-outline ml-2 shrink-0">k</span>
@@ -272,7 +501,7 @@
           <div class="grid grid-cols-2 gap-space-sm">
             <div class="flex flex-col gap-1">
               <label class="font-label-sm text-label-sm text-outline" for="cumulativeOrders">Số đơn cũ</label>
-              <div class="h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between">
+              <div class="h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between border border-transparent focus-within:border-primary/40 focus-within:bg-surface-container-lowest transition-all">
                 <input id="cumulativeOrders" type="number" value="0"
                   class="w-full bg-transparent font-headline-sm text-headline-sm text-on-surface font-mono focus:outline-none">
                 <span class="font-label-sm text-label-sm text-outline">Đơn</span>
@@ -280,7 +509,7 @@
             </div>
             <div class="flex flex-col gap-1">
               <label class="font-label-sm text-label-sm text-error" for="deduction">Tiền rớt/hủy đơn (k)</label>
-              <div class="h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between">
+              <div class="h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between border border-transparent focus-within:border-error/40 focus-within:bg-surface-container-lowest transition-all">
                 <input id="deduction" type="number" value="0"
                   class="w-full bg-transparent font-headline-sm text-headline-sm text-error font-mono focus:outline-none">
                 <span class="font-label-sm text-label-sm text-error shrink-0">k</span>
@@ -293,30 +522,30 @@
         <div class="flex flex-col gap-1">
           <div class="flex justify-between items-center">
             <label class="font-label-sm text-label-sm text-outline" for="rawText">Nội dung đơn hàng hôm nay (từ Zalo)</label>
-            <button id="btnParseDate" class="font-label-sm text-label-sm text-primary hover:underline transition-colors">Lấy ngày từ text</button>
+            <button id="btnParseDate" class="btn-press font-label-sm text-label-sm text-primary hover:underline transition-colors">Lấy ngày từ text</button>
           </div>
           <textarea id="rawText" rows="5" placeholder="Dán tin nhắn đơn hàng vào đây...&#10;Ví dụ: đơn 1: 5 thùng x 1200..."
-            class="w-full bg-surface-container-low rounded-lg p-3 font-body-sm text-body-sm text-on-surface font-mono focus:outline-none focus:bg-surface-container-lowest resize-none leading-relaxed transition-all placeholder:text-outline-variant"></textarea>
+            class="w-full bg-surface-container-low rounded-lg p-3 font-body-sm text-body-sm text-on-surface font-mono focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 resize-none leading-relaxed transition-all placeholder:text-outline-variant"></textarea>
           <div id="dateNotice" class="font-label-sm text-label-sm text-secondary font-medium px-1"></div>
         </div>
 
         <!-- Nút tính toán -->
         <button id="btnCalculate"
-          class="w-full h-12 rounded-xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-space-sm shadow-md active:scale-[0.985] transition-all">
+          class="btn-ripple shimmer-cta btn-press w-full h-12 rounded-xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-space-sm shadow-md hover:shadow-lg transition-all">
           <span class="material-symbols-outlined text-[20px]">calculate</span>
           <span>BẮT ĐẦU TÍNH TOÁN BÁO CÁO</span>
         </button>
       </div>
 
       <!-- Card: Kết quả báo cáo (ẩn ban đầu) -->
-      <div id="reportResultCard" class="hidden bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-md">
+      <div id="reportResultCard" class="hidden result-reveal-pop bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-md">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-space-xs">
-            <div class="w-7 h-7 rounded-lg bg-secondary-container flex items-center justify-center">
+            <div class="w-7 h-7 rounded-lg bg-secondary-container flex items-center justify-center shadow-sm">
               <span class="material-symbols-outlined text-on-secondary-container text-[18px]">send</span>
             </div>
             <div>
-              <span class="font-headline-sm text-headline-sm text-on-surface">Báo Cáo Hoàn Chỉnh</span>
+              <span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Báo Cáo Hoàn Chỉnh</span>
               <p class="font-label-sm text-label-sm text-outline">Bản chuẩn gửi Zalo / Telegram</p>
             </div>
           </div>
@@ -324,9 +553,9 @@
         </div>
 
         <!-- Output box: monospace, copy-ready -->
-        <div class="relative bg-surface-container-low rounded-xl border border-outline-variant/30 overflow-hidden">
+        <div class="relative bg-surface-container-low rounded-xl border border-outline-variant/30 overflow-hidden shadow-inner">
           <button id="btnCopy"
-            class="absolute top-2 right-2 z-10 flex items-center gap-1 px-2.5 py-1 bg-surface-container-lowest rounded-lg font-label-sm text-label-sm text-primary shadow-sm hover:bg-surface-container transition-colors active:scale-95">
+            class="btn-ripple btn-ripple-dark btn-press absolute top-2 right-2 z-10 flex items-center gap-1 px-2.5 py-1 bg-surface-container-lowest rounded-lg font-label-sm text-label-sm text-primary shadow-sm hover:bg-surface-container transition-colors">
             <span class="material-symbols-outlined text-[15px]" id="copy-icon">content_copy</span>
             <span id="copy-text">Sao chép</span>
           </button>
@@ -343,13 +572,13 @@
     <section id="view-lich-su" class="view-section flex-col gap-space-md pt-space-lg pb-space-xl">
 
       <!-- Tổng quan tháng -->
-      <div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm border border-outline-variant/20 flex flex-col gap-space-sm">
+      <div class="stagger-1 bg-surface-container-lowest rounded-2xl p-space-md shadow-sm border border-outline-variant/20 flex flex-col gap-space-sm hover:border-primary/30 transition-all">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-space-xs">
             <span class="material-symbols-outlined text-primary text-[20px]">calendar_month</span>
-            <span class="font-headline-sm text-headline-sm text-on-surface" id="history-month-title">Tháng hiện tại</span>
+            <span class="font-headline-sm text-headline-sm text-on-surface font-semibold" id="history-month-title">Tháng hiện tại</span>
           </div>
-          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-bold">
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-bold shadow-sm">
             <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
             <span id="history-record-count">0 Báo Cáo</span>
           </span>
@@ -360,7 +589,7 @@
             <span class="font-label-lg text-label-lg text-primary font-bold" id="history-total-rev">0k</span>
           </div>
           <div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
-            <div id="history-progress-bar" class="h-full rounded-full bg-primary transition-all" style="width:0%"></div>
+            <div id="history-progress-bar" class="progress-bar-shimmer h-full rounded-full bg-primary transition-all" style="width:0%"></div>
           </div>
           <div class="flex justify-between font-label-sm text-label-sm text-outline">
             <span id="history-days-worked">0 ngày báo cáo</span>
@@ -369,7 +598,7 @@
         </div>
         <div class="flex flex-col gap-space-sm pt-space-xs">
           <button id="btnExportCSV"
-            class="w-full h-14 rounded-lg bg-secondary text-on-secondary px-space-md flex items-center justify-between shadow-md active:scale-[0.99] transition-all">
+            class="btn-ripple shimmer-cta btn-press w-full h-14 rounded-lg bg-secondary text-on-secondary px-space-md flex items-center justify-between shadow-md hover:shadow-lg transition-all">
             <div class="flex items-center gap-space-sm">
               <div class="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center">
                 <span class="material-symbols-outlined text-white text-[22px]">table_chart</span>
@@ -382,7 +611,7 @@
             <span class="material-symbols-outlined text-[18px]">download</span>
           </button>
           <button id="btnClearHistory"
-            class="w-full h-11 rounded-lg bg-error-container text-on-error-container px-space-md flex items-center justify-center gap-space-xs active:bg-error-container/80 transition-colors">
+            class="btn-ripple btn-press w-full h-11 rounded-lg bg-error-container text-on-error-container px-space-md flex items-center justify-center gap-space-xs hover:bg-error-container/90 transition-colors">
             <span class="material-symbols-outlined text-[20px]">delete_outline</span>
             <span class="font-label-md text-label-md font-bold uppercase tracking-wider">Xóa lịch sử báo cáo</span>
           </button>
@@ -392,7 +621,7 @@
       <!-- Danh sách lịch sử -->
       <div class="flex flex-col gap-space-sm">
         <div class="flex items-center justify-between px-space-xs">
-          <h2 class="font-headline-sm text-headline-sm text-on-surface">Chi Tiết Từng Ngày</h2>
+          <h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Chi Tiết Từng Ngày</h2>
           <span class="font-label-sm text-label-sm text-primary font-semibold">Nhấn để xem chi tiết</span>
         </div>
         <div id="historyList" class="flex flex-col gap-space-sm"></div>
@@ -404,47 +633,47 @@
     <section id="view-chi-tieu" class="view-section flex-col gap-space-lg pt-space-lg pb-space-xl">
 
       <!-- Employee bar -->
-      <div class="flex items-center gap-space-sm px-space-md py-space-sm rounded-xl bg-surface-container-lowest shadow-sm border border-outline-variant/20">
+      <div class="stagger-1 flex items-center gap-space-sm px-space-md py-space-sm rounded-xl bg-surface-container-lowest shadow-sm border border-outline-variant/20 hover:border-primary/30 transition-all">
         <span class="material-symbols-outlined text-primary text-[20px]">person</span>
         <span id="settings-emp-display" class="font-headline-sm text-[16px] text-on-surface font-semibold">HÙNG DŨNG</span>
       </div>
 
       <!-- Core KPI settings -->
-      <section class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-lg">
+      <section class="stagger-2 bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-lg hover:border-primary/30 transition-all">
         <div class="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
           <div class="flex items-center gap-space-xs">
             <span class="material-symbols-outlined text-primary text-[22px]">tune</span>
             <h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Thiết Lập Chỉ Tiêu</h2>
           </div>
-          <span class="font-label-sm text-label-sm text-outline bg-surface-container px-2 py-0.5 rounded-full">KPI Tháng</span>
+          <span class="font-label-sm text-label-sm text-outline bg-surface-container px-2 py-0.5 rounded-full font-medium">KPI Tháng</span>
         </div>
         <div class="grid grid-cols-2 gap-space-md">
           <!-- Chỉ tiêu DS tháng -->
           <div class="flex flex-col gap-1.5">
             <label class="font-label-md text-label-md text-on-surface font-medium" for="kpiMonthRevenue">Chỉ tiêu DS tháng (k)</label>
             <input id="kpiMonthRevenue" type="number" value="120000"
-              class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:outline-none transition-all">
+              class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all">
             <span id="kpi-month-dong-note" class="font-body-sm text-[11px] text-outline">=120,000,000 đ</span>
           </div>
           <!-- Ngày công chuẩn -->
           <div class="flex flex-col gap-1.5">
             <label class="font-label-md text-label-md text-on-surface font-medium" for="kpiStandardDays">Ngày công chuẩn</label>
             <input id="kpiStandardDays" type="number" value="25" min="1" max="31"
-              class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:outline-none transition-all">
+              class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all">
             <span class="font-body-sm text-[11px] text-outline">Ngày làm việc</span>
           </div>
           <!-- Chỉ tiêu DS ngày -->
           <div class="flex flex-col gap-1.5">
             <label class="font-label-md text-label-md text-on-surface font-medium" for="kpiDayRevenue">Chỉ tiêu DS ngày (k)</label>
             <input id="kpiDayRevenue" type="number" value="4600"
-              class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:outline-none transition-all">
+              class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all">
             <span id="daily-auto-note" class="font-body-sm text-[11px] text-secondary font-medium">≈ 4,800k (tự tính)</span>
           </div>
           <!-- Chỉ tiêu tổng đơn -->
           <div class="flex flex-col gap-1.5">
             <label class="font-label-md text-label-md text-on-surface font-medium" for="kpiTotalOrders">Chỉ tiêu tổng đơn</label>
             <input id="kpiTotalOrders" type="number" value="175"
-              class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:outline-none transition-all">
+              class="w-full h-12 bg-surface-container-low text-on-surface font-headline-sm text-[20px] font-semibold px-space-md rounded-xl border border-outline-variant/30 focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all">
             <span class="font-body-sm text-[11px] text-outline">Đơn hàng / tháng</span>
           </div>
         </div>
@@ -457,7 +686,7 @@
               Đơn vị: ngàn đồng (k)
             </span>
             <button id="btnAutoCalc" type="button"
-              class="flex items-center gap-1.5 px-space-md py-1 rounded-full bg-primary text-on-primary hover:bg-primary-container active:scale-[0.985] shadow-sm transition-all text-[11px] font-label-sm font-semibold">
+              class="btn-ripple shimmer-cta btn-press flex items-center gap-1.5 px-space-md py-1 rounded-full bg-primary text-on-primary hover:bg-primary-container shadow-sm transition-all text-[11px] font-label-sm font-semibold">
               <span class="material-symbols-outlined text-[14px]">calculate</span>
               <span>Tự tính DS ngày</span>
             </button>
@@ -468,7 +697,7 @@
         </div>
 
         <button id="btnSaveKPI" type="button"
-          class="w-full h-12 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-space-xs shadow-md active:scale-[0.985] transition-all">
+          class="btn-ripple shimmer-cta btn-press w-full h-12 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-space-xs shadow-md hover:shadow-lg transition-all">
           <span class="material-symbols-outlined text-[20px]">check_circle</span>
           <span>Lưu Cài Đặt Chỉ Tiêu</span>
         </button>
@@ -478,20 +707,20 @@
   </main>
 
   <!-- ═══════════════════════════════════════════════ BOTTOM NAV ═══ -->
-  <nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)]">
+  <nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)] border-t border-outline-variant/15">
     <div class="max-w-[430px] mx-auto flex items-center justify-around h-16 px-space-sm">
       <a id="nav-lap" data-view="view-lap-bao-cao" data-title="Lập Báo Cáo" href="#"
-        class="nav-tab flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs text-primary tab-active transition-all">
+        class="nav-tab flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs text-primary tab-active">
         <span class="material-symbols-outlined text-[24px]">edit_note</span>
         <span class="font-label-sm text-label-sm">Lập Báo Cáo</span>
       </a>
       <a id="nav-lich-su" data-view="view-lich-su" data-title="Lịch Sử & Xuất" href="#"
-        class="nav-tab flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs text-on-surface-variant hover:text-on-surface transition-all">
+        class="nav-tab flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs text-on-surface-variant hover:text-on-surface">
         <span class="material-symbols-outlined text-[24px]">bar_chart</span>
         <span class="font-label-sm text-label-sm">Lịch Sử</span>
       </a>
       <a id="nav-chi-tieu" data-view="view-chi-tieu" data-title="Cài Đặt Chỉ Tiêu" href="#"
-        class="nav-tab flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs text-on-surface-variant hover:text-on-surface transition-all">
+        class="nav-tab flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs text-on-surface-variant hover:text-on-surface">
         <span class="material-symbols-outlined text-[24px]">tune</span>
         <span class="font-label-sm text-label-sm">Chỉ Tiêu</span>
       </a>
@@ -508,9 +737,9 @@
       <div class="flex items-center justify-between">
         <div>
           <span class="font-label-sm text-label-sm text-primary uppercase font-bold" id="modalDayTag">Ngày công</span>
-          <h3 class="font-headline-sm text-headline-sm text-on-surface" id="modalDate">Chi tiết báo cáo</h3>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold" id="modalDate">Chi tiết báo cáo</h3>
         </div>
-        <button id="btnCloseModal" class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface">
+        <button id="btnCloseModal" class="btn-press w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface">
           <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
       </div>
@@ -518,15 +747,15 @@
       <div class="grid grid-cols-2 gap-space-sm">
         <div class="p-space-sm bg-surface-container-low rounded-lg">
           <span class="font-label-md text-label-md text-on-surface-variant">Doanh số ngày</span>
-          <p class="font-headline-md text-headline-md text-primary mt-space-xs font-mono" id="modalRevenue">0k</p>
+          <p class="font-headline-md text-headline-md text-primary mt-space-xs font-mono font-bold" id="modalRevenue">0k</p>
         </div>
         <div class="p-space-sm bg-surface-container-low rounded-lg">
           <span class="font-label-md text-label-md text-on-surface-variant">Lũy tiến tháng</span>
-          <p class="font-headline-md text-headline-md text-on-surface mt-space-xs font-mono" id="modalCumulative">0k</p>
+          <p class="font-headline-md text-headline-md text-on-surface mt-space-xs font-mono font-bold" id="modalCumulative">0k</p>
         </div>
       </div>
       <!-- Meta -->
-      <div class="p-space-md bg-surface-container-lowest rounded-lg shadow-sm flex flex-col gap-space-sm">
+      <div class="p-space-md bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/20 flex flex-col gap-space-sm">
         <div class="flex justify-between items-center">
           <span class="font-body-sm text-body-sm text-on-surface-variant">Số đơn hôm nay</span>
           <span class="font-label-lg text-label-lg text-on-surface font-semibold" id="modalOrders">0 đơn</span>
@@ -537,28 +766,28 @@
         </div>
         <div class="flex justify-between items-center">
           <span class="font-body-sm text-body-sm text-on-surface-variant">Trưng bày 3% / 5%</span>
-          <span class="font-body-sm text-body-sm text-on-surface-variant" id="modalDisplay">0 / 0</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant font-medium" id="modalDisplay">0 / 0</span>
         </div>
       </div>
       <!-- Report text -->
       <div class="flex flex-col gap-space-xs">
         <span class="font-label-md text-label-md text-on-surface-variant">Văn bản báo cáo</span>
-        <pre id="modalReportText" class="font-mono text-code-output text-on-surface bg-surface-container-low p-space-sm rounded-lg whitespace-pre-wrap leading-relaxed select-all"></pre>
+        <pre id="modalReportText" class="font-mono text-code-output text-on-surface bg-surface-container-low p-space-sm rounded-lg whitespace-pre-wrap leading-relaxed select-all shadow-inner"></pre>
       </div>
       <!-- Raw text -->
       <div class="flex flex-col gap-space-xs">
         <span class="font-label-md text-label-md text-on-surface-variant">Đơn hàng gốc</span>
-        <pre id="modalRawText" class="font-mono text-[11px] text-on-surface bg-surface-container-low p-space-sm rounded-lg whitespace-pre-wrap max-h-[100px] overflow-y-auto"></pre>
+        <pre id="modalRawText" class="font-mono text-[11px] text-on-surface bg-surface-container-low p-space-sm rounded-lg whitespace-pre-wrap max-h-[100px] overflow-y-auto shadow-inner"></pre>
       </div>
       <!-- Actions -->
       <div class="flex items-center gap-space-sm pt-space-xs">
         <button id="btnModalCopyReport"
-          class="flex-1 h-12 rounded-lg bg-surface-container text-primary font-label-lg text-label-lg active:scale-95 transition-transform flex items-center justify-center gap-space-xs">
+          class="btn-ripple btn-ripple-dark btn-press flex-1 h-12 rounded-lg bg-surface-container text-primary font-label-lg text-label-lg flex items-center justify-center gap-space-xs font-semibold">
           <span class="material-symbols-outlined text-[20px]">content_copy</span>
           Sao chép báo cáo
         </button>
         <button id="btnModalCopyRaw"
-          class="flex-1 h-12 rounded-lg bg-primary text-on-primary font-label-lg text-label-lg shadow-md active:scale-95 transition-transform flex items-center justify-center gap-space-xs">
+          class="btn-ripple shimmer-cta btn-press flex-1 h-12 rounded-lg bg-primary text-on-primary font-label-lg text-label-lg shadow-md flex items-center justify-center gap-space-xs font-semibold">
           <span class="material-symbols-outlined text-[20px]">article</span>
           Sao chép đơn gốc
         </button>
@@ -605,6 +834,58 @@
     const fmtK = (num) => new Intl.NumberFormat('vi-VN').format(Math.round(num)) + 'k';
 
     // ─────────────────────────────────────────────────────────────
+    // ANIMATION & MOTION HELPERS
+    // ─────────────────────────────────────────────────────────────
+    function animateCount(el, start, end, duration = 380, formatFn = (n) => n) {
+      if (!el) return;
+      const s = Number(start) || 0;
+      const e = Number(end) || 0;
+      if (s === e) { el.innerText = formatFn(e); return; }
+      const hasRAF = typeof requestAnimationFrame === 'function';
+      const nowFn = (typeof performance !== 'undefined' && typeof performance.now === 'function')
+        ? () => performance.now() : () => Date.now();
+      if (!hasRAF) { el.innerText = formatFn(e); return; }
+      const startTime = nowFn();
+      function step(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+        const current = Math.round(s + (e - s) * ease);
+        el.innerText = formatFn(current);
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          el.innerText = formatFn(e);
+          el.classList.add('number-bump');
+          setTimeout(() => el.classList.remove('number-bump'), 320);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    function initRippleEffects() {
+      if (typeof document === 'undefined' || !document.addEventListener) return;
+      document.addEventListener('pointerdown', (e) => {
+        const btn = e.target && e.target.closest ? e.target.closest('.btn-ripple') : null;
+        if (!btn) return;
+        const circle = document.createElement('span');
+        const diameter = Math.max(btn.clientWidth || 40, btn.clientHeight || 40);
+        const radius = diameter / 2;
+        const rect = btn.getBoundingClientRect ? btn.getBoundingClientRect() : { left: 0, top: 0 };
+        const x = (e.clientX ? e.clientX - rect.left : (btn.clientWidth || 40) / 2) - radius;
+        const y = (e.clientY ? e.clientY - rect.top : (btn.clientHeight || 40) / 2) - radius;
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${x}px`;
+        circle.style.top = `${y}px`;
+        circle.className = 'ripple-wave';
+        const existing = btn.querySelector ? btn.querySelector('.ripple-wave') : null;
+        if (existing) existing.remove();
+        btn.appendChild(circle);
+        setTimeout(() => circle.remove(), 550);
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────
     // 2. TAB NAVIGATION
     // ─────────────────────────────────────────────────────────────
     function switchTab(viewId, title) {
@@ -616,7 +897,12 @@
       });
 
       const target = document.getElementById(viewId);
-      if (target) target.classList.add('active');
+      if (target) {
+        target.classList.add('active');
+        if (typeof window !== 'undefined' && window.scrollTo) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
 
       const activeNav = document.querySelector(`.nav-tab[data-view="${viewId}"]`);
       if (activeNav) {
@@ -624,7 +910,12 @@
         activeNav.classList.remove('text-on-surface-variant');
       }
 
-      document.getElementById('header-title').innerText = title;
+      const headerTitle = document.getElementById('header-title');
+      if (headerTitle) {
+        headerTitle.innerText = title;
+        headerTitle.classList.add('number-bump');
+        setTimeout(() => headerTitle.classList.remove('number-bump'), 320);
+      }
 
       if (viewId === 'view-lich-su') refreshHistoryView();
     }
@@ -768,6 +1059,9 @@
 
       // Update KPI settings daily note
       updateAutoNote();
+
+      // Khởi tạo hiệu ứng sóng chạm cảm ứng (Ripple interaction)
+      initRippleEffects();
     }
 
     function updateHeaderMonthBadge(m, y) {
@@ -832,8 +1126,16 @@
           count5 += item.count5 || 0;
         }
       });
-      document.getElementById('display3Count').innerText = count3;
-      document.getElementById('display5Count').innerText = count5;
+      const el3 = document.getElementById('display3Count');
+      const el5 = document.getElementById('display5Count');
+      if (el3) {
+        const prev3 = parseInt(el3.innerText) || 0;
+        animateCount(el3, prev3, count3);
+      }
+      if (el5) {
+        const prev5 = parseInt(el5.innerText) || 0;
+        animateCount(el5, prev5, count5);
+      }
 
       // Update mini progress bar
       const kpiMonthRevenue = parseInt(localStorage.getItem('kpiMonthRevenue')) || DEFAULT_KPI.kpiMonthRevenue;
@@ -848,7 +1150,10 @@
       const cumulativeLabel = document.getElementById('mini-cumulative-label');
       const kpiLabel = document.getElementById('mini-kpi-label');
       if (progressBar) progressBar.style.width = pct + '%';
-      if (progressLabel) progressLabel.innerText = pct + '%';
+      if (progressLabel) {
+        const prevPct = parseInt(progressLabel.innerText) || 0;
+        animateCount(progressLabel, prevPct, pct, 380, (n) => `${n}%`);
+      }
       if (cumulativeLabel) cumulativeLabel.innerText = `Lũy kế: ${fmtK(totalCum)}`;
       if (kpiLabel) kpiLabel.innerText = `Mục tiêu: ${fmtK(kpiMonthRevenue)}`;
     }
@@ -939,6 +1244,9 @@
       document.getElementById('reportOutput').innerText = reportText;
       const resultCard = document.getElementById('reportResultCard');
       resultCard.classList.remove('hidden');
+      resultCard.classList.remove('result-reveal-pop');
+      if (typeof window !== 'undefined' && resultCard.offsetWidth !== undefined) void resultCard.offsetWidth;
+      resultCard.classList.add('result-reveal-pop');
       resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
       // Save record
@@ -1010,9 +1318,10 @@
         list.innerHTML = '<div class="text-center text-on-surface-variant font-body-md py-8">Chưa có báo cáo nào.</div>';
         return;
       }
-      historyData.forEach(item => {
+      historyData.forEach((item, index) => {
         const div = document.createElement('div');
-        div.className = 'bg-surface-container-lowest rounded-xl p-space-md shadow-sm border border-outline-variant/20 flex flex-col gap-space-sm active:bg-surface-container-low transition-colors cursor-pointer relative overflow-hidden';
+        div.className = 'history-card-in bg-surface-container-lowest rounded-xl p-space-md shadow-sm border border-outline-variant/20 flex flex-col gap-space-sm active:bg-surface-container-low transition-colors cursor-pointer relative overflow-hidden';
+        if (div.style) div.style.animationDelay = `${Math.min(index * 45, 300)}ms`;
         const today = new Date();
         const todayStr = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
         const isToday = item.date === todayStr;
@@ -1021,7 +1330,7 @@
           <div class="flex items-center justify-between ${isToday ? 'pl-2' : ''}">
             <div class="flex items-center gap-space-xs">
               <span class="font-headline-sm text-headline-sm text-on-surface font-bold">${item.date}</span>
-              ${isToday ? '<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-bold">Hôm nay</span>' : ''}
+              ${isToday ? '<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-bold shadow-sm">Hôm nay</span>' : ''}
               <span class="font-label-sm text-label-sm text-on-surface-variant">• Ngày công ${item.workDay}</span>
             </div>
             <div class="flex items-center gap-1 text-secondary font-label-sm text-label-sm font-semibold">
@@ -1044,7 +1353,7 @@
               <span class="material-symbols-outlined text-[16px] text-outline">shopping_bag</span>
               ${item.orders} đơn | TB: ${item.count3}(3%) ${item.count5}(5%)
             </span>
-            <span class="material-symbols-outlined text-on-surface-variant text-[18px]">chevron_right</span>
+            <span class="material-symbols-outlined text-on-surface-variant text-[18px] group-hover:translate-x-1 transition-transform">chevron_right</span>
           </div>
         `;
         div.addEventListener('click', () => openDetailModal(item));
